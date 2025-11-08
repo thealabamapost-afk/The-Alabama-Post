@@ -100,10 +100,6 @@
     display: block;
     border-bottom: 3px solid #b91c1c;
     border-radius: 8px 8px 0 0;
-    transition: transform 0.3s ease;
-  }
-  .reflector-article:hover img {
-    transform: scale(1.03);
   }
   .reflector-article-content {
     text-align: left;
@@ -179,9 +175,10 @@
   const spinner = document.getElementById("loadingSpinner");
   const feed = document.getElementById("reflectorFeed");
 
-  fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}&api_key=${apiKey}`)
+  // Use rss2json API with cache for speed
+  fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}&api_key=${apiKey}&count=8`)
     .then(res => res.json())
-    .then(async data => {
+    .then(data => {
       spinner.style.display = "none";
       feed.innerHTML = "";
 
@@ -190,29 +187,19 @@
         return;
       }
 
-      for (const item of data.items.slice(0, 8)) {
+      data.items.forEach(item => {
         let image = "";
-
-        // 🧩 Attempt to extract <img> from item.description
-        const descMatch = item.description.match(/<img[^>]+src="([^">]+)"/);
-        if (descMatch) image = descMatch[1];
-
-        // 🧩 If still empty, fetch the article page & find first image
-        if (!image) {
-          try {
-            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(item.link)}`;
-            const htmlRes = await fetch(proxyUrl);
-            const htmlData = await htmlRes.json();
-            const html = htmlData.contents;
-            const imgMatch = html.match(/<img[^>]+src="([^">]+)"/i);
-            if (imgMatch) image = imgMatch[1];
-          } catch (e) {
-            console.warn("No image found for:", item.link);
-          }
+        if (item.enclosure && item.enclosure.link) {
+          image = item.enclosure.link;
+        } else if (item.thumbnail) {
+          image = item.thumbnail;
+        } else if (item.content && item.content.includes("img")) {
+          const match = item.content.match(/<img[^>]+src="([^">]+)"/);
+          if (match) image = match[1];
         }
-
-        if (!image || !image.startsWith("http"))
+        if (!image) {
           image = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
+        }
 
         const article = document.createElement("div");
         article.classList.add("reflector-article");
@@ -227,19 +214,18 @@
           </div>
         `;
         feed.appendChild(article);
-      }
-
-      const updatedElement = document.getElementById("lastUpdated");
-      updatedElement.textContent = "Last Updated: " + new Date().toLocaleString("en-US", {
-        dateStyle: "long",
-        timeStyle: "short"
       });
+
+      document.getElementById("lastUpdated").textContent =
+        "Last Updated: " + new Date().toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" });
     })
     .catch(err => {
       console.error(err);
       spinner.style.display = "none";
       feed.innerHTML = "<p>Unable to load Alabama Reflector stories right now.</p>";
+      document.getElementById("lastUpdated").textContent = "Last Updated: (Error loading feed)";
     });
 </script>
+
 </body>
 </html>
