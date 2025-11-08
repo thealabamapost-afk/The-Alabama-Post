@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>The Alabama Post | Reflector News Feed</title>
 
-<!-- ✅ TikTok + social preview support -->
+<!-- ✅ TikTok + social preview -->
 <meta property="og:image" content="https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png">
 <meta property="og:title" content="The Alabama Post | From the Alabama Reflector">
 <meta property="og:description" content="Latest news from The Alabama Reflector, updated live on The Alabama Post.">
@@ -17,6 +17,7 @@
     background-color: #f9fafb;
     color: #111827;
   }
+
   header {
     background-color: #111827;
     color: #fff;
@@ -28,13 +29,13 @@
     margin: 0;
     font-size: 2.4rem;
     color: #f97316;
-    letter-spacing: 0.5px;
   }
   header p {
     color: #d1d5db;
     margin-top: 5px;
     font-size: 1rem;
   }
+
   .reflector {
     background: #fff;
     border-radius: 12px;
@@ -44,6 +45,7 @@
     margin: 50px auto;
     max-width: 1150px;
   }
+
   .reflector h2 {
     font-size: 2.1rem;
     font-weight: 800;
@@ -53,17 +55,36 @@
     margin-bottom: 30px;
     display: inline-block;
   }
+
   .updated {
     font-size: 0.95rem;
     color: #6b7280;
     margin-bottom: 35px;
   }
+
+  /* ✅ Spinner styles */
+  .spinner {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border: 4px solid #b91c1c;
+    border-top: 4px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-top: 15px;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
   .reflector-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
     gap: 35px;
     justify-content: center;
   }
+
   .reflector-article {
     background: #f9fafb;
     border-radius: 12px;
@@ -104,14 +125,7 @@
     color: #6b7280;
     margin-top: 10px;
   }
-  footer {
-    text-align: center;
-    color: #9ca3af;
-    font-size: 0.9rem;
-    padding: 20px 0;
-    margin-top: 60px;
-    background-color: #111827;
-  }
+
   .more-btn {
     display: inline-block;
     margin-top: 35px;
@@ -126,11 +140,20 @@
   .more-btn:hover {
     background: #991b1b;
   }
+
+  footer {
+    text-align: center;
+    color: #9ca3af;
+    font-size: 0.9rem;
+    padding: 20px 0;
+    margin-top: 60px;
+    background-color: #111827;
+  }
 </style>
 </head>
 <body>
 
-<!-- ✅ Force TikTok to open in real browser -->
+<!-- ✅ Force TikTok to open in a real browser -->
 <script>
 if (navigator.userAgent.includes('TikTok')) {
   window.location.href = 'https://thealabamapost-afk.github.io/The-Alabama-Post/?openExternalBrowser=1';
@@ -145,7 +168,12 @@ if (navigator.userAgent.includes('TikTok')) {
 <div class="reflector">
   <h2>From the Alabama Reflector</h2>
   <p class="updated" id="lastUpdated">Loading latest update...</p>
+
+  <!-- ✅ Spinner visible while feed loads -->
+  <div id="loadingSpinner" class="spinner"></div>
+
   <div class="reflector-grid" id="reflectorFeed"></div>
+
   <a href="https://alabamareflector.com" target="_blank" class="more-btn">View More from Alabama Reflector →</a>
 </div>
 
@@ -154,44 +182,40 @@ if (navigator.userAgent.includes('TikTok')) {
 </footer>
 
 <script>
-  const proxyUrl = "https://api.allorigins.win/get?url=";
-  const feedUrl = encodeURIComponent("https://alabamareflector.com/feed/");
-  fetch(`${proxyUrl}${feedUrl}`)
+  const feedUrl = "https://alabamareflector.com/feed/";
+  const spinner = document.getElementById("loadingSpinner");
+  const feed = document.getElementById("reflectorFeed");
+
+  fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`)
     .then(res => res.json())
     .then(data => {
-      const parser = new DOMParser();
-      const xml = parser.parseFromString(data.contents, "text/xml");
-      const items = xml.querySelectorAll("item");
-      const feed = document.getElementById("reflectorFeed");
-      items.forEach((item, i) => {
-        if (i >= 8) return;
-        const title = item.querySelector("title").textContent;
-        const link = item.querySelector("link").textContent;
-        const description = item.querySelector("description").textContent;
+      feed.innerHTML = "";
+      spinner.style.display = "none"; // ✅ Hide spinner when done
+
+      data.items.slice(0, 8).forEach(item => {
         let image = "";
-        const media = item.querySelector("media\\:content, content");
-        if (media && media.getAttribute("url")) {
-          image = media.getAttribute("url");
+        if (item.enclosure && item.enclosure.link) {
+          image = item.enclosure.link;
         } else {
-          const match = description.match(/<img[^>]+src="([^">]+)"/);
+          const match = item.description.match(/<img[^>]+src="([^">]+)"/);
           if (match) image = match[1];
         }
 
-        // ✅ TikTok fix: use CORS-safe proxy
+        // ✅ Safe proxy for TikTok browser
         if (image && image.startsWith('http')) {
           image = `https://api.allorigins.win/raw?url=${encodeURIComponent(image)}`;
         }
 
         if (!image)
           image = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
-        
+
         const article = document.createElement("div");
         article.classList.add("reflector-article");
         article.innerHTML = `
           <img src="${image}" alt="Article Image" />
           <div class="reflector-article-content">
-            <a href="${link}" target="_blank" rel="noopener noreferrer">${title}</a>
-            <p>${description.replace(/<[^>]*>?/gm,"").substring(0,250)}...</p>
+            <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>
+            <p>${item.description.replace(/<[^>]*>?/gm,"").substring(0,250)}...</p>
             <p class="credit">
               Source: <a href="https://alabamareflector.com" target="_blank" rel="noopener noreferrer">Alabama Reflector</a>
             </p>
@@ -200,7 +224,7 @@ if (navigator.userAgent.includes('TikTok')) {
         feed.appendChild(article);
       });
 
-      // ✅ Add "Last Updated" timestamp
+      // ✅ Show "Last Updated" time
       const updatedElement = document.getElementById("lastUpdated");
       const now = new Date();
       updatedElement.textContent = "Last Updated: " + now.toLocaleString("en-US", {
@@ -210,8 +234,8 @@ if (navigator.userAgent.includes('TikTok')) {
     })
     .catch(err => {
       console.error(err);
-      document.getElementById("reflectorFeed").innerHTML =
-        "<p>Unable to load Alabama Reflector stories right now.</p>";
+      spinner.style.display = "none";
+      feed.innerHTML = "<p>Unable to load Alabama Reflector stories right now.</p>";
       document.getElementById("lastUpdated").textContent = "Last Updated: (Error loading feed)";
     });
 </script>
