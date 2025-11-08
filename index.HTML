@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Alabama Post | Reflector News Feed</title>
+<style>
+  body {
+    margin: 0;
+    font-family: "Inter","Segoe UI",Arial,sans-serif;
+    background-color: #f9fafb;
+    color: #111827;
+  }
+  header {
+    background-color: #111827;
+    color: #fff;
+    text-align: center;
+    padding: 35px 0 30px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+  }
+  header h1 {
+    margin: 0;
+    font-size: 2.4rem;
+    color: #f97316;
+    letter-spacing: 0.5px;
+  }
+  header p {
+    color: #d1d5db;
+    margin-top: 5px;
+    font-size: 1rem;
+  }
+  .reflector {
+    background: #fff;
+    border-radius: 12px;
+    padding: 40px 35px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    text-align: center;
+    margin: 50px auto;
+    max-width: 1150px;
+  }
+  .reflector h2 {
+    font-size: 2.1rem;
+    font-weight: 800;
+    color: #b91c1c;
+    border-bottom: 4px solid #b91c1c;
+    padding-bottom: 10px;
+    margin-bottom: 40px;
+    display: inline-block;
+  }
+  .reflector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(340px,1fr));
+    gap: 35px;
+    justify-content: center;
+  }
+  .reflector-article {
+    background: #f9fafb;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .reflector-article:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  }
+  .reflector-article img {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    display: block;
+  }
+  .reflector-article-content {
+    text-align: left;
+    padding: 20px 22px 25px;
+  }
+  .reflector-article a {
+    text-decoration: none;
+    color: #b91c1c;
+    font-weight: 700;
+    font-size: 1.25rem;
+    line-height: 1.5;
+  }
+  .reflector-article a:hover { text-decoration: underline; }
+  .reflector-article p {
+    margin-top: 10px;
+    color: #374151;
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+  .credit {
+    font-size: 0.95rem;
+    color: #6b7280;
+    margin-top: 10px;
+  }
+  .more-btn {
+    display: inline-block;
+    margin-top: 40px;
+    padding: 14px 32px;
+    background: #b91c1c;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: background 0.2s ease;
+  }
+  .more-btn:hover {
+    background: #991b1b;
+  }
+  footer {
+    text-align: center;
+    color: #9ca3af;
+    font-size: 0.9rem;
+    padding: 20px 0;
+    margin-top: 60px;
+    background-color: #111827;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>The Alabama Post</h1>
+  <p>Independent • Honest • Fearless Journalism</p>
+</header>
+
+<div class="reflector">
+  <h2>From the Alabama Reflector</h2>
+  <div class="reflector-grid" id="reflectorFeed"></div>
+  <a href="https://alabamareflector.com" target="_blank" class="more-btn">View More from Alabama Reflector →</a>
+</div>
+
+<footer>
+  © 2025 The Alabama Post | Decatur, Alabama | “Where Truth Meets Independence”
+</footer>
+
+<script>
+fetch("https://api.rss2json.com/v1/api.json?rss_url=https://alabamareflector.com/feed/")
+  .then(res => res.json())
+  .then(data => {
+    const feed = document.getElementById("reflectorFeed");
+    feed.innerHTML = "";
+    data.items.slice(0, 8).forEach(item => {
+      const image = item.enclosure?.link || item.thumbnail || "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
+      const article = document.createElement("div");
+      article.classList.add("reflector-article");
+      article.innerHTML = `
+        <img src="${image}" alt="Article Image" />
+        <div class="reflector-article-content">
+          <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>
+          <p>${item.description.replace(/<[^>]*>?/gm, "").substring(0, 250)}...</p>
+          <p class="credit">
+            Source: <a href="https://alabamareflector.com" target="_blank" rel="noopener noreferrer">Alabama Reflector</a>
+          </p>
+        </div>
+      `;
+      feed.appendChild(article);
+    });
+  })
+  .catch(err => {
+    console.error(err);
+    document.getElementById("reflectorFeed").innerHTML =
+      "<p>Unable to load Alabama Reflector stories right now.</p>";
+  });
+</script>
+</body>
+</html>
