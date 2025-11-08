@@ -52,33 +52,61 @@ footer{text-align:center;color:#9ca3af;font-size:0.9rem;padding:20px 0;margin-to
 </footer>
 
 <script>
+const FEED_URL = "https://alabamareflector.com/feed/";
+const FALLBACK_IMAGE = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
 const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
 const updated = document.getElementById("lastUpdated");
-const FEED_URL = "https://alabamareflector.com/feed/";
-const FALLBACK_IMAGE = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
 
-// Try multiple proxies (AllOrigins + Codetabs)
-async function fetchFeed(proxyUrl) {
-  const res = await fetch(proxyUrl);
-  const data = await res.json();
+// Fetch and parse RSS safely
+async function loadFeed() {
+  spinner.style.display = "inline-block";
+  feed.innerHTML = "";
+
+  const urls = [
+    FEED_URL, // Direct feed first
+    "https://api.allorigins.win/get?url=" + encodeURIComponent(FEED_URL),
+    "https://api.codetabs.com/v1/proxy/?quest=" + encodeURIComponent(FEED_URL)
+  ];
+
+  let xmlText = null;
+
+  for (let u of urls) {
+    try {
+      const res = await fetch(u);
+      if (!res.ok) continue;
+      const data = u.includes("api.")
+        ? (await res.json()).contents
+        : await res.text();
+      xmlText = data;
+      if (xmlText) break;
+    } catch (err) {
+      console.warn("Fetch failed:", u);
+    }
+  }
+
+  spinner.style.display = "none";
+  if (!xmlText) {
+    feed.innerHTML = "<p>Unable to load Alabama Reflector stories right now.</p>";
+    updated.textContent = "Last Updated: (Feed unavailable)";
+    return;
+  }
+
   const parser = new DOMParser();
-  const xml = parser.parseFromString(data.contents, "text/xml");
-  
-  // Handle both RSS and Atom namespaces safely
+  const xml = parser.parseFromString(xmlText, "text/xml");
   const items = xml.querySelectorAll("item, entry");
-  return Array.from(items).slice(0, 8).map(item => {
+  if (!items.length) {
+    feed.innerHTML = "<p>No stories found. Please check again soon.</p>";
+    return;
+  }
+
+  const articles = Array.from(items).slice(0, 10).map(item => {
     const title = item.querySelector("title")?.textContent || "Untitled";
-    const link =
-      item.querySelector("link")?.textContent ||
-      item.querySelector("link")?.getAttribute("href") ||
-      "#";
-    const desc =
-      item.querySelector("description")?.textContent ||
-      item.querySelector("content\\:encoded")?.textContent ||
-      "";
+    const link = item.querySelector("link")?.textContent ||
+                 item.querySelector("link")?.getAttribute("href") || "#";
+    const desc = item.querySelector("description")?.textContent ||
+                 item.querySelector("content\\:encoded")?.textContent || "";
     let img = "";
-    // Try enclosure, media:content, or fallback from <img>
     const enclosure = item.querySelector("enclosure, media\\:content");
     if (enclosure && enclosure.getAttribute("url")) {
       img = enclosure.getAttribute("url");
@@ -89,47 +117,20 @@ async function fetchFeed(proxyUrl) {
     if (!img) img = FALLBACK_IMAGE;
     return { title, link, desc, img };
   });
-}
 
-async function loadFeed() {
-  spinner.style.display = "inline-block";
   feed.innerHTML = "";
-
-  const proxies = [
-    "https://api.allorigins.win/get?url=" + encodeURIComponent(FEED_URL),
-    "https://api.codetabs.com/v1/proxy/?quest=" + encodeURIComponent(FEED_URL)
-  ];
-
-  let articles = [];
-  for (let proxy of proxies) {
-    try {
-      articles = await fetchFeed(proxy);
-      if (articles.length) break;
-    } catch (e) {
-      console.warn("Proxy failed:", proxy, e);
-    }
-  }
-
-  spinner.style.display = "none";
-
-  if (!articles.length) {
-    feed.innerHTML = "<p>No stories found. Please check again soon.</p>";
-    updated.textContent = "Last Updated: (Feed unavailable)";
-    return;
-  }
-
-  articles.forEach(a => {
+  for (let a of articles) {
     const el = document.createElement("div");
     el.classList.add("reflector-article");
     el.innerHTML = `
       <img src="${a.img}" alt="Article Image" loading="lazy" />
       <div class="reflector-article-content">
         <a href="${a.link}" target="_blank">${a.title}</a>
-        <p>${a.desc.replace(/<[^>]*>?/gm,"").substring(0,200)}...</p>
+        <p>${a.desc.replace(/<[^>]*>?/gm,"").substring(0,250)}...</p>
         <p class="credit">Source: <a href="https://alabamareflector.com" target="_blank">Alabama Reflector</a></p>
       </div>`;
     feed.appendChild(el);
-  });
+  }
 
   updated.textContent =
     "Last Updated: " +
@@ -137,10 +138,7 @@ async function loadFeed() {
     " | Auto-refreshes every 2 hours 🔄";
 }
 
-// Initial load
 loadFeed();
-
-// Auto-refresh every 2 hours
 setInterval(loadFeed, 7200000);
 </script>
 </body>
