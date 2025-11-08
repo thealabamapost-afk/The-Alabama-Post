@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>The Alabama Post | Reflector News Feed</title>
 
-<!-- ✅ TikTok & social preview -->
 <meta property="og:image" content="https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png">
 <meta property="og:title" content="The Alabama Post | From the Alabama Reflector">
 <meta property="og:description" content="Latest news from The Alabama Reflector, updated live on The Alabama Post.">
@@ -62,7 +61,6 @@
     margin-bottom: 35px;
   }
 
-  /* ✅ Spinner styles */
   .spinner {
     display: inline-block;
     width: 40px;
@@ -73,7 +71,6 @@
     animation: spin 1s linear infinite;
     margin-top: 15px;
   }
-
   @keyframes spin {
     to { transform: rotate(360deg); }
   }
@@ -159,13 +156,6 @@
 </head>
 <body>
 
-<!-- ✅ Force TikTok to open in real browser -->
-<script>
-if (navigator.userAgent.includes('TikTok')) {
-  window.location.href = 'https://thealabamapost-afk.github.io/The-Alabama-Post/?openExternalBrowser=1';
-}
-</script>
-
 <header>
   <h1>The Alabama Post</h1>
   <p>Independent • Honest • Fearless Journalism</p>
@@ -174,12 +164,8 @@ if (navigator.userAgent.includes('TikTok')) {
 <div class="reflector">
   <h2>From the Alabama Reflector</h2>
   <p class="updated" id="lastUpdated">Loading latest update...</p>
-
-  <!-- ✅ Spinner visible while feed loads -->
   <div id="loadingSpinner" class="spinner"></div>
-
   <div class="reflector-grid" id="reflectorFeed"></div>
-
   <a href="https://alabamareflector.com" target="_blank" class="more-btn">View More from Alabama Reflector →</a>
 </div>
 
@@ -187,7 +173,6 @@ if (navigator.userAgent.includes('TikTok')) {
   © 2025 The Alabama Post | Decatur, Alabama | “Where Truth Meets Independence”
 </footer>
 
-<!-- ✅ MAIN SCRIPT -->
 <script>
   const apiKey = "kowavs2lr19xrqnlsdesyot0aphugzv8mjnhrt4v";
   const feedUrl = "https://alabamareflector.com/feed/";
@@ -196,7 +181,7 @@ if (navigator.userAgent.includes('TikTok')) {
 
   fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}&api_key=${apiKey}`)
     .then(res => res.json())
-    .then(data => {
+    .then(async data => {
       spinner.style.display = "none";
       feed.innerHTML = "";
 
@@ -205,22 +190,24 @@ if (navigator.userAgent.includes('TikTok')) {
         return;
       }
 
-      data.items.slice(0, 8).forEach(item => {
+      for (const item of data.items.slice(0, 8)) {
         let image = "";
 
-        // ✅ Enhanced image detection
-        const imgRegexes = [
-          /<img[^>]+src="([^">]+)"/,
-          /wp-content\/uploads\/[^\s"']+/g,
-          /https:\/\/[^\s"']+\.(jpg|jpeg|png|gif)/gi
-        ];
+        // 🧩 Attempt to extract <img> from item.description
+        const descMatch = item.description.match(/<img[^>]+src="([^">]+)"/);
+        if (descMatch) image = descMatch[1];
 
-        for (const regex of imgRegexes) {
-          const match = item.description.match(regex);
-          if (match) {
-            image = match[1] || match[0];
-            if (!image.startsWith("http")) image = "https://" + image;
-            break;
+        // 🧩 If still empty, fetch the article page & find first image
+        if (!image) {
+          try {
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(item.link)}`;
+            const htmlRes = await fetch(proxyUrl);
+            const htmlData = await htmlRes.json();
+            const html = htmlData.contents;
+            const imgMatch = html.match(/<img[^>]+src="([^">]+)"/i);
+            if (imgMatch) image = imgMatch[1];
+          } catch (e) {
+            console.warn("No image found for:", item.link);
           }
         }
 
@@ -240,11 +227,10 @@ if (navigator.userAgent.includes('TikTok')) {
           </div>
         `;
         feed.appendChild(article);
-      });
+      }
 
       const updatedElement = document.getElementById("lastUpdated");
-      const now = new Date();
-      updatedElement.textContent = "Last Updated: " + now.toLocaleString("en-US", {
+      updatedElement.textContent = "Last Updated: " + new Date().toLocaleString("en-US", {
         dateStyle: "long",
         timeStyle: "short"
       });
@@ -253,9 +239,7 @@ if (navigator.userAgent.includes('TikTok')) {
       console.error(err);
       spinner.style.display = "none";
       feed.innerHTML = "<p>Unable to load Alabama Reflector stories right now.</p>";
-      document.getElementById("lastUpdated").textContent = "Last Updated: (Error loading feed)";
     });
 </script>
-
 </body>
 </html>
