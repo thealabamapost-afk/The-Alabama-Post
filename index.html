@@ -50,8 +50,13 @@
     color: #b91c1c;
     border-bottom: 4px solid #b91c1c;
     padding-bottom: 10px;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
     display: inline-block;
+  }
+  .updated {
+    font-size: 0.95rem;
+    color: #6b7280;
+    margin-bottom: 35px;
   }
   .reflector-grid {
     display: grid;
@@ -139,6 +144,7 @@ if (navigator.userAgent.includes('TikTok')) {
 
 <div class="reflector">
   <h2>From the Alabama Reflector</h2>
+  <p class="updated" id="lastUpdated">Loading latest update...</p>
   <div class="reflector-grid" id="reflectorFeed"></div>
   <a href="https://alabamareflector.com" target="_blank" class="more-btn">View More from Alabama Reflector →</a>
 </div>
@@ -171,7 +177,7 @@ if (navigator.userAgent.includes('TikTok')) {
           if (match) image = match[1];
         }
 
-        // ✅ Fix for TikTok: use safe proxy for images
+        // ✅ TikTok fix: use CORS-safe proxy
         if (image && image.startsWith('http')) {
           image = `https://api.allorigins.win/raw?url=${encodeURIComponent(image)}`;
         }
@@ -193,11 +199,20 @@ if (navigator.userAgent.includes('TikTok')) {
         `;
         feed.appendChild(article);
       });
+
+      // ✅ Add "Last Updated" timestamp
+      const updatedElement = document.getElementById("lastUpdated");
+      const now = new Date();
+      updatedElement.textContent = "Last Updated: " + now.toLocaleString("en-US", {
+        dateStyle: "long",
+        timeStyle: "short"
+      });
     })
     .catch(err => {
       console.error(err);
       document.getElementById("reflectorFeed").innerHTML =
         "<p>Unable to load Alabama Reflector stories right now.</p>";
+      document.getElementById("lastUpdated").textContent = "Last Updated: (Error loading feed)";
     });
 </script>
 
