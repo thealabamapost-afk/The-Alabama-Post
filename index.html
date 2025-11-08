@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>The Alabama Post | Reflector News Feed</title>
 
-<!-- ✅ TikTok + social preview -->
+<!-- ✅ TikTok & social preview -->
 <meta property="og:image" content="https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png">
 <meta property="og:title" content="The Alabama Post | From the Alabama Reflector">
 <meta property="og:description" content="Latest news from The Alabama Reflector, updated live on The Alabama Post.">
@@ -153,7 +153,7 @@
 </head>
 <body>
 
-<!-- ✅ Force TikTok to open in a real browser -->
+<!-- ✅ Force TikTok to open in real browser -->
 <script>
 if (navigator.userAgent.includes('TikTok')) {
   window.location.href = 'https://thealabamapost-afk.github.io/The-Alabama-Post/?openExternalBrowser=1';
@@ -181,51 +181,45 @@ if (navigator.userAgent.includes('TikTok')) {
   © 2025 The Alabama Post | Decatur, Alabama | “Where Truth Meets Independence”
 </footer>
 
+<!-- ✅ MAIN SCRIPT -->
 <script>
-  const feedUrl = encodeURIComponent("https://alabamareflector.com/feed/");
+  const apiKey = "YOUR_API_KEY_HERE"; // ← Replace this with your rss2json key
+  const feedUrl = "https://alabamareflector.com/feed/";
   const spinner = document.getElementById("loadingSpinner");
   const feed = document.getElementById("reflectorFeed");
 
-  fetch(`https://api.allorigins.win/get?url=${feedUrl}`)
+  fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}&api_key=${apiKey}`)
     .then(res => res.json())
     .then(data => {
       spinner.style.display = "none";
-      const parser = new DOMParser();
-      const xml = parser.parseFromString(data.contents, "text/xml");
-      const items = xml.querySelectorAll("item");
       feed.innerHTML = "";
 
-      items.forEach((item, i) => {
-        if (i >= 8) return;
-        const title = item.querySelector("title")?.textContent || "Untitled";
-        const link = item.querySelector("link")?.textContent || "#";
-        const description = item.querySelector("description")?.textContent || "";
-        let image = "";
+      if (!data.items || data.items.length === 0) {
+        feed.innerHTML = "<p>No stories found. Please check again soon.</p>";
+        return;
+      }
 
-        const media = item.querySelector("media\\:content, content");
-        if (media && media.getAttribute("url")) {
-          image = media.getAttribute("url");
+      data.items.slice(0, 8).forEach(item => {
+        let image = "";
+        if (item.enclosure && item.enclosure.link) {
+          image = item.enclosure.link;
         } else {
-          const match = description.match(/<img[^>]+src="([^">]+)"/);
+          const match = item.description.match(/<img[^>]+src="([^">]+)"/);
           if (match) image = match[1];
         }
-
         if (!image)
           image = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
-
-        // ✅ Use proxy for TikTok browser compatibility
-        if (image.startsWith("http")) {
-          image = `https://api.allorigins.win/raw?url=${encodeURIComponent(image)}`;
-        }
 
         const article = document.createElement("div");
         article.classList.add("reflector-article");
         article.innerHTML = `
           <img src="${image}" alt="Article Image" />
           <div class="reflector-article-content">
-            <a href="${link}" target="_blank" rel="noopener noreferrer">${title}</a>
-            <p>${description.replace(/<[^>]*>?/gm,"").substring(0,250)}...</p>
-            <p class="credit">Source: <a href="https://alabamareflector.com" target="_blank" rel="noopener noreferrer">Alabama Reflector</a></p>
+            <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>
+            <p>${item.description.replace(/<[^>]*>?/gm,"").substring(0,250)}...</p>
+            <p class="credit">
+              Source: <a href="https://alabamareflector.com" target="_blank" rel="noopener noreferrer">Alabama Reflector</a>
+            </p>
           </div>
         `;
         feed.appendChild(article);
