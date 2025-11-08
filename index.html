@@ -101,6 +101,12 @@
     height: 240px;
     object-fit: cover;
     display: block;
+    border-bottom: 3px solid #b91c1c;
+    border-radius: 8px 8px 0 0;
+    transition: transform 0.3s ease;
+  }
+  .reflector-article:hover img {
+    transform: scale(1.03);
   }
   .reflector-article-content {
     text-align: left;
@@ -183,7 +189,7 @@ if (navigator.userAgent.includes('TikTok')) {
 
 <!-- ✅ MAIN SCRIPT -->
 <script>
-  const apiKey = "kowavs2lr19xrqnlsdesyot0aphugzv8mjnhrt4v"; // ← Replace this with your rss2json key
+  const apiKey = "kowavs2lr19xrqnlsdesyot0aphugzv8mjnhrt4v";
   const feedUrl = "https://alabamareflector.com/feed/";
   const spinner = document.getElementById("loadingSpinner");
   const feed = document.getElementById("reflectorFeed");
@@ -201,19 +207,30 @@ if (navigator.userAgent.includes('TikTok')) {
 
       data.items.slice(0, 8).forEach(item => {
         let image = "";
-        if (item.enclosure && item.enclosure.link) {
-          image = item.enclosure.link;
-        } else {
-          const match = item.description.match(/<img[^>]+src="([^">]+)"/);
-          if (match) image = match[1];
+
+        // ✅ Enhanced image detection
+        const imgRegexes = [
+          /<img[^>]+src="([^">]+)"/,
+          /wp-content\/uploads\/[^\s"']+/g,
+          /https:\/\/[^\s"']+\.(jpg|jpeg|png|gif)/gi
+        ];
+
+        for (const regex of imgRegexes) {
+          const match = item.description.match(regex);
+          if (match) {
+            image = match[1] || match[0];
+            if (!image.startsWith("http")) image = "https://" + image;
+            break;
+          }
         }
-        if (!image)
+
+        if (!image || !image.startsWith("http"))
           image = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
 
         const article = document.createElement("div");
         article.classList.add("reflector-article");
         article.innerHTML = `
-          <img src="${image}" alt="Article Image" />
+          <img src="${image}" alt="Article Image" loading="lazy" />
           <div class="reflector-article-content">
             <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>
             <p>${item.description.replace(/<[^>]*>?/gm,"").substring(0,250)}...</p>
@@ -242,4 +259,3 @@ if (navigator.userAgent.includes('TikTok')) {
 
 </body>
 </html>
-
