@@ -52,6 +52,7 @@ footer{text-align:center;color:#9ca3af;font-size:0.9rem;padding:20px 0;margin-to
 </footer>
 
 <script>
+const API_KEY = "kowavs2lr19xrqnlsdesyot0aphugzv8mjnhrt4v"; // your rss2json key
 const FEED_URL = "https://alabamareflector.com/feed/";
 const FALLBACK_IMAGE = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
 const feed = document.getElementById("reflectorFeed");
@@ -62,83 +63,45 @@ async function loadFeed() {
   spinner.style.display = "inline-block";
   feed.innerHTML = "";
 
-  const urls = [
-    FEED_URL,
-    "https://api.allorigins.win/get?url=" + encodeURIComponent(FEED_URL),
-    "https://api.codetabs.com/v1/proxy/?quest=" + encodeURIComponent(FEED_URL)
-  ];
+  try {
+    const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(FEED_URL)}&api_key=${API_KEY}`);
+    const data = await res.json();
+    spinner.style.display = "none";
 
-  let xmlText = null;
-  for (let u of urls) {
-    try {
-      const res = await fetch(u);
-      if (!res.ok) continue;
-      const data = u.includes("api.") ? (await res.json()).contents : await res.text();
-      xmlText = data;
-      if (xmlText) break;
-    } catch (e) {
-      console.warn("Proxy failed:", u);
+    if (!data.items || data.items.length === 0) {
+      feed.innerHTML = "<p>No stories found. Please check again soon.</p>";
+      return;
     }
-  }
 
-  spinner.style.display = "none";
-  if (!xmlText) {
-    feed.innerHTML = "<p>Unable to load Alabama Reflector stories right now.</p>";
-    updated.textContent = "Last Updated: (Feed unavailable)";
-    return;
-  }
-
-  const parser = new DOMParser();
-  const xml = parser.parseFromString(xmlText, "text/xml");
-  const items = xml.querySelectorAll("item, entry");
-  if (!items.length) {
-    feed.innerHTML = "<p>No stories found. Please check again soon.</p>";
-    return;
-  }
-
-  const articles = Array.from(items).slice(0, 10).map(item => {
-    const getText = (selectors) => {
-      for (let s of selectors) {
-        const el = item.querySelector(s);
-        if (el) return el.textContent;
+    data.items.slice(0, 10).forEach(item => {
+      let image = item.enclosure?.link || "";
+      if (!image) {
+        const match = item.description.match(/<img[^>]+src="([^">]+)"/);
+        if (match) image = match[1];
       }
-      return "";
-    };
+      if (!image) image = FALLBACK_IMAGE;
 
-    const title = getText(["title"]);
-    const link = item.querySelector("link")?.getAttribute("href") ||
-                 item.querySelector("link")?.textContent || "#";
-    const desc = getText(["description", "content\\:encoded", "summary", "content"]);
-    let img = "";
-    const enclosure = item.querySelector("enclosure, media\\:content");
-    if (enclosure && enclosure.getAttribute("url")) {
-      img = enclosure.getAttribute("url");
-    } else {
-      const match = desc.match(/<img[^>]+src="([^">]+)"/);
-      if (match) img = match[1];
-    }
-    if (!img) img = FALLBACK_IMAGE;
-    return { title, link, desc, img };
-  });
+      const article = document.createElement("div");
+      article.classList.add("reflector-article");
+      article.innerHTML = `
+        <img src="${image}" alt="Article Image" loading="lazy" />
+        <div class="reflector-article-content">
+          <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>
+          <p>${item.description.replace(/<[^>]*>?/gm,"").substring(0,250)}...</p>
+          <p class="credit">Source: <a href="https://alabamareflector.com" target="_blank" rel="noopener noreferrer">Alabama Reflector</a></p>
+        </div>
+      `;
+      feed.appendChild(article);
+    });
 
-  feed.innerHTML = "";
-  for (let a of articles) {
-    const el = document.createElement("div");
-    el.classList.add("reflector-article");
-    el.innerHTML = `
-      <img src="${a.img}" alt="Article Image" loading="lazy" />
-      <div class="reflector-article-content">
-        <a href="${a.link}" target="_blank">${a.title}</a>
-        <p>${a.desc.replace(/<[^>]*>?/gm,"").substring(0,250)}...</p>
-        <p class="credit">Source: <a href="https://alabamareflector.com" target="_blank">Alabama Reflector</a></p>
-      </div>`;
-    feed.appendChild(el);
+    updated.textContent =
+      "Last Updated: " +
+      new Date().toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" });
+  } catch (error) {
+    console.error(error);
+    spinner.style.display = "none";
+    feed.innerHTML = "<p>Unable to load Alabama Reflector stories right now.</p>";
   }
-
-  updated.textContent =
-    "Last Updated: " +
-    new Date().toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" }) +
-    " | Auto-refreshes every 2 hours 🔄";
 }
 
 loadFeed();
