@@ -10,140 +10,27 @@
 <meta property="og:description" content="Latest news from The Alabama Reflector, updated live on The Alabama Post.">
 
 <style>
-body {
-  margin: 0;
-  font-family: "Inter","Segoe UI",Arial,sans-serif;
-  background: #f9fafb;
-  color: #111827;
-}
-
-header {
-  background: #111827;
-  color: #fff;
-  text-align: center;
-  padding: 35px 0 30px;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-}
-header h1 {
-  margin: 0;
-  font-size: 2.4rem;
-  color: #f97316;
-}
-header p {
-  color: #d1d5db;
-  margin-top: 5px;
-  font-size: 1rem;
-}
-
-.reflector {
-  background: #fff;
-  border-radius: 12px;
-  padding: 40px 35px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-  text-align: center;
-  margin: 50px auto;
-  max-width: 1150px;
-}
-.reflector h2 {
-  font-size: 2.1rem;
-  font-weight: 800;
-  color: #b91c1c;
-  border-bottom: 4px solid #b91c1c;
-  padding-bottom: 10px;
-  margin-bottom: 30px;
-  display: inline-block;
-}
-
-.updated {
-  font-size: 0.95rem;
-  color: #6b7280;
-  margin-bottom: 35px;
-}
-
-.spinner {
-  display: inline-block;
-  width: 40px;
-  height: 40px;
-  border: 4px solid #b91c1c;
-  border-top: 4px solid transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-top: 15px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.reflector-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
-  gap: 35px;
-  justify-content: center;
-}
-
-.reflector-article {
-  background: #f9fafb;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.reflector-article:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
-}
-.reflector-article img {
-  width: 100%;
-  height: 240px;
-  object-fit: cover;
-  display: block;
-  border-bottom: 3px solid #b91c1c;
-}
-.reflector-article-content {
-  text-align: left;
-  padding: 20px 22px 25px;
-}
-.reflector-article a {
-  text-decoration: none;
-  color: #b91c1c;
-  font-weight: 700;
-  font-size: 1.3rem;
-  line-height: 1.5;
-}
-.reflector-article a:hover { text-decoration: underline; }
-.reflector-article p {
-  margin-top: 10px;
-  color: #374151;
-  font-size: 1.05rem;
-  line-height: 1.7;
-}
-.credit {
-  font-size: 0.95rem;
-  color: #6b7280;
-  margin-top: 10px;
-}
-
-.more-btn {
-  display: inline-block;
-  margin-top: 35px;
-  padding: 12px 26px;
-  background: #b91c1c;
-  color: #fff;
-  text-decoration: none;
-  border-radius: 6px;
-  font-weight: 600;
-  transition: background 0.2s ease;
-}
-.more-btn:hover {
-  background: #991b1b;
-}
-
-footer {
-  text-align: center;
-  color: #9ca3af;
-  font-size: 0.9rem;
-  padding: 20px 0;
-  margin-top: 60px;
-  background: #111827;
-}
+body{margin:0;font-family:"Inter","Segoe UI",Arial,sans-serif;background:#f9fafb;color:#111827;}
+header{background:#111827;color:#fff;text-align:center;padding:35px 0 30px;box-shadow:0 3px 6px rgba(0,0,0,0.2);}
+header h1{margin:0;font-size:2.4rem;color:#f97316;}
+header p{color:#d1d5db;margin-top:5px;font-size:1rem;}
+.reflector{background:#fff;border-radius:12px;padding:40px 35px;box-shadow:0 4px 10px rgba(0,0,0,0.08);text-align:center;margin:50px auto;max-width:1150px;}
+.reflector h2{font-size:2.1rem;font-weight:800;color:#b91c1c;border-bottom:4px solid #b91c1c;padding-bottom:10px;margin-bottom:30px;display:inline-block;}
+.updated{font-size:0.95rem;color:#6b7280;margin-bottom:35px;}
+.spinner{display:inline-block;width:40px;height:40px;border:4px solid #b91c1c;border-top:4px solid transparent;border-radius:50%;animation:spin 1s linear infinite;margin-top:15px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.reflector-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:35px;justify-content:center;}
+.reflector-article{background:#f9fafb;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.08);transition:transform 0.2s ease,box-shadow 0.2s ease;}
+.reflector-article:hover{transform:translateY(-5px);box-shadow:0 6px 18px rgba(0,0,0,0.15);}
+.reflector-article img{width:100%;height:240px;object-fit:cover;display:block;border-bottom:3px solid #b91c1c;}
+.reflector-article-content{text-align:left;padding:20px 22px 25px;}
+.reflector-article a{text-decoration:none;color:#b91c1c;font-weight:700;font-size:1.3rem;line-height:1.5;}
+.reflector-article a:hover{text-decoration:underline;}
+.reflector-article p{margin-top:10px;color:#374151;font-size:1.05rem;line-height:1.7;}
+.credit{font-size:0.95rem;color:#6b7280;margin-top:10px;}
+.more-btn{display:inline-block;margin-top:35px;padding:12px 26px;background:#b91c1c;color:#fff;text-decoration:none;border-radius:6px;font-weight:600;transition:background 0.2s ease;}
+.more-btn:hover{background:#991b1b;}
+footer{text-align:center;color:#9ca3af;font-size:0.9rem;padding:20px 0;margin-top:60px;background:#111827;}
 </style>
 </head>
 <body>
@@ -157,9 +44,7 @@ footer {
   <p class="updated" id="lastUpdated">Loading latest update...</p>
   <div id="loadingSpinner" class="spinner"></div>
   <div class="reflector-grid" id="reflectorFeed"></div>
-  <a href="https://alabamareflector.com" target="_blank" class="more-btn">
-    View More from Alabama Reflector →
-  </a>
+  <a href="https://alabamareflector.com" target="_blank" class="more-btn">View More from Alabama Reflector →</a>
 </div>
 
 <footer>
@@ -173,29 +58,37 @@ const updated = document.getElementById("lastUpdated");
 const FEED_URL = "https://alabamareflector.com/feed/";
 const FALLBACK_IMAGE = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
 
-function fetchFeed(proxyUrl) {
-  return fetch(proxyUrl)
-    .then(res => res.json())
-    .then(data => {
-      const parser = new DOMParser();
-      const xml = parser.parseFromString(data.contents, "text/xml");
-      const items = xml.querySelectorAll("item");
-      return Array.from(items).slice(0, 8).map(item => {
-        const title = item.querySelector("title")?.textContent || "Untitled";
-        const link = item.querySelector("link")?.textContent || "#";
-        const desc = item.querySelector("description")?.textContent || "";
-        let img = "";
-        const media = item.querySelector("media\\:content, content\\:encoded");
-        if (media && media.getAttribute && media.getAttribute("url")) {
-          img = media.getAttribute("url");
-        } else {
-          const match = desc.match(/<img[^>]+src="([^">]+)"/);
-          if (match) img = match[1];
-        }
-        if (!img) img = FALLBACK_IMAGE;
-        return { title, link, desc, img };
-      });
-    });
+// Try multiple proxies (AllOrigins + Codetabs)
+async function fetchFeed(proxyUrl) {
+  const res = await fetch(proxyUrl);
+  const data = await res.json();
+  const parser = new DOMParser();
+  const xml = parser.parseFromString(data.contents, "text/xml");
+  
+  // Handle both RSS and Atom namespaces safely
+  const items = xml.querySelectorAll("item, entry");
+  return Array.from(items).slice(0, 8).map(item => {
+    const title = item.querySelector("title")?.textContent || "Untitled";
+    const link =
+      item.querySelector("link")?.textContent ||
+      item.querySelector("link")?.getAttribute("href") ||
+      "#";
+    const desc =
+      item.querySelector("description")?.textContent ||
+      item.querySelector("content\\:encoded")?.textContent ||
+      "";
+    let img = "";
+    // Try enclosure, media:content, or fallback from <img>
+    const enclosure = item.querySelector("enclosure, media\\:content");
+    if (enclosure && enclosure.getAttribute("url")) {
+      img = enclosure.getAttribute("url");
+    } else {
+      const match = desc.match(/<img[^>]+src="([^">]+)"/);
+      if (match) img = match[1];
+    }
+    if (!img) img = FALLBACK_IMAGE;
+    return { title, link, desc, img };
+  });
 }
 
 async function loadFeed() {
@@ -213,19 +106,19 @@ async function loadFeed() {
       articles = await fetchFeed(proxy);
       if (articles.length) break;
     } catch (e) {
-      console.warn("Proxy failed:", proxy);
+      console.warn("Proxy failed:", proxy, e);
     }
   }
 
   spinner.style.display = "none";
 
   if (!articles.length) {
-    feed.innerHTML = "<p>Unable to load Alabama Reflector stories right now.</p>";
+    feed.innerHTML = "<p>No stories found. Please check again soon.</p>";
     updated.textContent = "Last Updated: (Feed unavailable)";
     return;
   }
 
-  for (let a of articles) {
+  articles.forEach(a => {
     const el = document.createElement("div");
     el.classList.add("reflector-article");
     el.innerHTML = `
@@ -236,7 +129,7 @@ async function loadFeed() {
         <p class="credit">Source: <a href="https://alabamareflector.com" target="_blank">Alabama Reflector</a></p>
       </div>`;
     feed.appendChild(el);
-  }
+  });
 
   updated.textContent =
     "Last Updated: " +
@@ -244,10 +137,10 @@ async function loadFeed() {
     " | Auto-refreshes every 2 hours 🔄";
 }
 
-// Load immediately
+// Initial load
 loadFeed();
 
-// ✅ Auto-refresh every 2 hours (7200000 ms)
+// Auto-refresh every 2 hours
 setInterval(loadFeed, 7200000);
 </script>
 </body>
