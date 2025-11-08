@@ -58,30 +58,26 @@ const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
 const updated = document.getElementById("lastUpdated");
 
-// Fetch and parse RSS safely
 async function loadFeed() {
   spinner.style.display = "inline-block";
   feed.innerHTML = "";
 
   const urls = [
-    FEED_URL, // Direct feed first
+    FEED_URL,
     "https://api.allorigins.win/get?url=" + encodeURIComponent(FEED_URL),
     "https://api.codetabs.com/v1/proxy/?quest=" + encodeURIComponent(FEED_URL)
   ];
 
   let xmlText = null;
-
   for (let u of urls) {
     try {
       const res = await fetch(u);
       if (!res.ok) continue;
-      const data = u.includes("api.")
-        ? (await res.json()).contents
-        : await res.text();
+      const data = u.includes("api.") ? (await res.json()).contents : await res.text();
       xmlText = data;
       if (xmlText) break;
-    } catch (err) {
-      console.warn("Fetch failed:", u);
+    } catch (e) {
+      console.warn("Proxy failed:", u);
     }
   }
 
@@ -101,11 +97,18 @@ async function loadFeed() {
   }
 
   const articles = Array.from(items).slice(0, 10).map(item => {
-    const title = item.querySelector("title")?.textContent || "Untitled";
-    const link = item.querySelector("link")?.textContent ||
-                 item.querySelector("link")?.getAttribute("href") || "#";
-    const desc = item.querySelector("description")?.textContent ||
-                 item.querySelector("content\\:encoded")?.textContent || "";
+    const getText = (selectors) => {
+      for (let s of selectors) {
+        const el = item.querySelector(s);
+        if (el) return el.textContent;
+      }
+      return "";
+    };
+
+    const title = getText(["title"]);
+    const link = item.querySelector("link")?.getAttribute("href") ||
+                 item.querySelector("link")?.textContent || "#";
+    const desc = getText(["description", "content\\:encoded", "summary", "content"]);
     let img = "";
     const enclosure = item.querySelector("enclosure, media\\:content");
     if (enclosure && enclosure.getAttribute("url")) {
