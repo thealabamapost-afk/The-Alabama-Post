@@ -66,6 +66,11 @@ h2 {
   object-fit: cover;
   border-bottom: 3px solid #b91c1c;
   background: #f3f3f3;
+  opacity: 0;
+  transition: opacity 0.6s ease-in;
+}
+.reflector-article img.loaded {
+  opacity: 1;
 }
 .reflector-article-content {
   padding: 18px 20px 25px;
@@ -151,8 +156,11 @@ const updated = document.getElementById("lastUpdated");
 const BASE_PATH = window.location.pathname.replace(/\/[^/]*$/, '');
 const FEED_URL = `${BASE_PATH}/reflector.json`;
 
+// ✅ FIXED: Proxy encoder for CORS-safe image loading
 function proxyImage(url) {
-  return `${PROXY}${encodeURIComponent(url)}&default=${encodeURIComponent(FALLBACK_IMAGE)}`;
+  if (!url) return FALLBACK_IMAGE;
+  const clean = url.replace(/^https?:\/\//, '');
+  return `${PROXY}${encodeURIComponent('https://' + clean)}?output=webp&default=${encodeURIComponent(FALLBACK_IMAGE)}`;
 }
 
 async function loadFeed() {
@@ -188,6 +196,11 @@ async function loadFeed() {
           <p class="credit">Source: <a href="https://alabamareflector.com" target="_blank">Alabama Reflector</a></p>
         </div>`;
       feed.appendChild(card);
+    });
+
+    // Smooth image fade-in
+    document.querySelectorAll('.reflector-article img').forEach(img => {
+      img.addEventListener('load', () => img.classList.add('loaded'));
     });
 
     updated.textContent =
