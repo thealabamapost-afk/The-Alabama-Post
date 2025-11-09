@@ -1,47 +1,65 @@
 {
   "status": "ok",
   "feed": {
-    "url": "https://feeds.feedburner.com/alabamareflector/0zGtsmkibDb",
     "title": "Alabama Reflector",
     "link": "https://alabamareflector.com/",
-    "author": "",
     "description": "Clarity today for a better tomorrow",
-    "image": "https://alabamareflector.com/wp-content/uploads/2023/01/cropped-AL-Reflector-Icon-1-lg-32x32.png"
+    "image": "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png"
   },
   "items": [
     {
       "title": "States are quietly cutting child care funding — and families are out of options",
-      "pubDate": "2025-11-08 13:01:52",
       "link": "https://alabamareflector.com/2025/11/08/states-are-quietly-cutting-child-care-funding-and-families-are-out-of-options/",
-      "guid": "https://alabamareflector.com/?p=16880",
-      "author": "Chabeli Carrazana, The 19th",
-      "thumbnail": "",
-      "description": "This story was originally reported by Chabeli Carrazana of The 19th...",
-      "content": "<img width=\"1024\" height=\"768\" src=\"https://alabamareflector.com/wp-content/uploads/2025/11/Childcare-crisis-Indiana-for-Nov-8-2025-story-1024x768.jpg\" alt=\"A woman holding up a sign saying 'Child care crisis'\" />",
-      "enclosure": {},
-      "categories": [
-        "Government & Politics",
-        "American Rescue Plan Act of 2021",
-        "child care",
-        "COVID-19"
-      ]
+      "thumbnail": "https://alabamareflector.com/wp-content/uploads/2025/11/Childcare-funding-protest-Indiana-1024x683.jpg",
+      "description": "Families in Indiana and other states are losing child care assistance due to federal funding cuts."
     },
     {
-      "title": "US Supreme Court temporarily blocks November SNAP payments",
-      "pubDate": "2025-11-08 03:34:52",
-      "link": "https://alabamareflector.com/2025/11/07/repub/us-supreme-court-temporarily-blocks-november-snap-payments/",
-      "guid": "https://alabamareflector.com/?post_type=republished&p=16887",
-      "author": "Jacob Fischler",
-      "thumbnail": "",
-      "description": "The U.S. Supreme Court temporarily blocked a lower court’s order that the Trump administration pay full November food benefits...",
-      "content": "<img width=\"1024\" src=\"https://alabamareflector.com/wp-content/uploads/2025/11/supremecourtoctober2024norman-1024x768.jpeg\" alt=\"The U.S. Supreme Court\" />",
-      "enclosure": {},
-      "categories": [
-        "D.C. Bureau",
-        "Congress",
-        "Food insecurity",
-        "Supreme Court of the United States (SCOTUS)"
-      ]
+      "title": "U.S. Supreme Court temporarily blocks November SNAP payments",
+      "link": "https://alabamareflector.com/2025/11/08/us-supreme-court-temporarily-blocks-november-snap-payments/",
+      "thumbnail": "https://alabamareflector.com/wp-content/uploads/2025/11/supreme-court-building-1024x683.jpg",
+      "description": "The Supreme Court has temporarily blocked a lower court ruling requiring full SNAP payments for November."
+    },
+    {
+      "title": "Health care premiums to surge for Alabamians with no ACA deal in Congress",
+      "link": "https://alabamareflector.com/2025/11/06/health-care-premiums-to-surge-for-alabamians-with-no-aca-deal-in-congress/",
+      "thumbnail": "https://alabamareflector.com/wp-content/uploads/2025/11/healthcare-premiums-1024x683.jpg",
+      "description": "Without congressional action, thousands of Alabamians face significant health insurance premium hikes."
+    },
+    {
+      "title": "Alabama bill would further restrict communications for sex offenders",
+      "link": "https://alabamareflector.com/2025/11/07/alabama-bill-would-further-restrict-communications-for-sex-offenders/",
+      "thumbnail": "https://alabamareflector.com/wp-content/uploads/2025/11/Alabama-State-House-1024x682.jpg",
+      "description": "A new Alabama bill aims to further limit communication rights for registered sex offenders in the state."
+    },
+    {
+      "title": "States’ death penalty policies are heading in sharply different directions",
+      "link": "https://alabamareflector.com/2025/11/07/states-death-penalty-policies-are-heading-in-sharply-different-directions/",
+      "thumbnail": "https://alabamareflector.com/wp-content/uploads/2025/11/death-penalty-debate-1024x682.jpg",
+      "description": "While some states ramp up executions, others continue to move toward abolition or moratoriums."
+    },
+    {
+      "title": "Trump administration issues November SNAP benefits, then asks Supreme Court to intervene",
+      "link": "https://alabamareflector.com/2025/11/07/repub/trump-administration-issues-november-snap-benefits-then-asks-supreme-court-to-intervene/",
+      "thumbnail": "https://alabamareflector.com/wp-content/uploads/2025/11/SNAP-benefits-card-1024x683.jpg",
+      "description": "The Trump administration has distributed SNAP benefits but is appealing the lower court decision."
+    },
+    {
+      "title": "Full November SNAP benefits to be issued by Trump administration despite shutdown",
+      "link": "https://alabamareflector.com/2025/11/07/repub/full-november-snap-benefits-to-be-issued-by-trump-administration-despite-shutdown/",
+      "thumbnail": "https://alabamareflector.com/wp-content/uploads/2025/11/SNAP-distribution-center-1024x683.jpg",
+      "description": "Despite a government shutdown, November SNAP benefits will still be distributed to eligible households."
+    },
+    {
+      "title": "Montgomery police arrest fifth suspect in October shooting",
+      "link": "https://alabamareflector.com/briefs/montgomery-police-arrest-fifth-suspect-in-october-shooting/",
+      "thumbnail": "https://alabamareflector.com/wp-content/uploads/2025/11/Montgomery-police-vehicle-1024x683.jpg",
+      "description": "Montgomery police have arrested a fifth suspect connected to a late-October shooting."
+    },
+    {
+      "title": "U.S. Senate fails to pass war powers resolution blocking Trump attacks on Venezuela",
+      "link": "https://alabamareflector.com/2025/11/07/repub/us-senate-fails-to-pass-war-powers-resolution-blocking-trump-attacks-on-venezuela/",
+      "thumbnail": "https://alabamareflector.com/wp-content/uploads/2025/11/Senate-floor-debate-1024x683.jpg",
+      "description": "A Senate effort to limit Trump’s authority for military action in Venezuela narrowly failed on Friday."
     }
   ]
 }
