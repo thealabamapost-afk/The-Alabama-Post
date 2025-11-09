@@ -22,7 +22,7 @@ header p{color:#d1d5db;margin-top:5px;font-size:1rem;}
 .reflector-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:35px;justify-content:center;}
 .reflector-article{background:#f9fafb;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.08);transition:transform 0.2s ease,box-shadow 0.2s ease;}
 .reflector-article:hover{transform:translateY(-5px);box-shadow:0 6px 18px rgba(0,0,0,0.15);}
-.reflector-article img{width:100%;height:240px;object-fit:cover;display:block;border-bottom:3px solid #b91c1c;}
+.reflector-article img{width:100%;height:240px;object-fit:cover;display:block;border-bottom:3px solid #b91c1c;background:#f1f1f1;}
 .reflector-article-content{text-align:left;padding:20px 22px 25px;}
 .reflector-article a{text-decoration:none;color:#b91c1c;font-weight:700;font-size:1.3rem;line-height:1.5;}
 .reflector-article a:hover{text-decoration:underline;}
@@ -34,6 +34,7 @@ footer{text-align:center;color:#9ca3af;font-size:0.9rem;padding:20px 0;margin-to
 </style>
 </head>
 <body>
+
 <header>
   <h1>The Alabama Post</h1>
   <p>Independent • Honest • Fearless Journalism</p>
@@ -52,9 +53,10 @@ footer{text-align:center;color:#9ca3af;font-size:0.9rem;padding:20px 0;margin-to
 </footer>
 
 <script>
-const API_KEY = "kowavs2lr19xrqnlsdesyot0aphugzv8mjnhrt4v"; // rss2json key
+const API_KEY = "kowavs2lr19xrqnlsdesyot0aphugzv8mjnhrt4v";
 const FEED_URL = "https://feeds.feedburner.com/alabamareflector/0zGtsmkibDb";
 const FALLBACK_IMAGE = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
+const PROXY = "https://images.weserv.nl/?url="; // fixes blocked image loading
 const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
 const updated = document.getElementById("lastUpdated");
@@ -73,18 +75,23 @@ async function loadFeed() {
       return;
     }
 
-    data.items.slice(0, 10).forEach(item => {
-      let image = item.enclosure?.link || "";
-      if (!image) {
+    data.items.slice(0, 8).forEach(item => {
+      let image = "";
+      if (item.enclosure && item.enclosure.link) {
+        image = item.enclosure.link;
+      } else {
         const match = item.description.match(/<img[^>]+src="([^">]+)"/);
         if (match) image = match[1];
       }
       if (!image) image = FALLBACK_IMAGE;
+      if (image.startsWith("https://")) image = image.replace("https://", "");
+
+      const proxiedImage = PROXY + image;
 
       const article = document.createElement("div");
       article.classList.add("reflector-article");
       article.innerHTML = `
-        <img src="${image}" alt="Article Image" loading="lazy" />
+        <img src="${proxiedImage}" alt="Article Image" loading="lazy" />
         <div class="reflector-article-content">
           <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>
           <p>${item.description.replace(/<[^>]*>?/gm,"").substring(0,250)}...</p>
