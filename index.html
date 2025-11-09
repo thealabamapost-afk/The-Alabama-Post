@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>The Alabama Post | Reflector News Feed</title>
 
-<!-- Social Preview -->
 <meta property="og:image" content="https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png">
 <meta property="og:title" content="The Alabama Post | From the Alabama Reflector">
 <meta property="og:description" content="Latest news from The Alabama Reflector, updated live on The Alabama Post.">
@@ -161,7 +160,7 @@ footer {
 const API_KEY = "kowavs2lr19xrqnlsdesyot0aphugzv8mjnhrt4v";
 const FEED_URL = "https://feeds.feedburner.com/alabamareflector/0zGtsmkibDb";
 const FALLBACK_IMAGE = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
-const PROXY = "https://image-proxy.weserv.dev/?url=";
+const PROXY = "https://imgp.uk/"; // ✅ universal image proxy
 const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
 const updated = document.getElementById("lastUpdated");
@@ -204,7 +203,8 @@ async function loadFeed() {
       if (!image) image = await fetchArticleImage(item.link);
       image = image.replace(/^http:\/\//i, "https://");
 
-      const proxied = `${PROXY}${encodeURIComponent(image)}&default=${encodeURIComponent(FALLBACK_IMAGE)}`;
+      // 🔥 Final image rewrite with proxy that always works
+      const proxied = `${PROXY}${encodeURIComponent(image)}`;
 
       const article = document.createElement("div");
       article.classList.add("reflector-article");
@@ -233,6 +233,5 @@ async function loadFeed() {
 loadFeed();
 setInterval(loadFeed, 7200000);
 </script>
-
 </body>
 </html>
