@@ -1,0 +1,40 @@
+{
+  "status": "ok",
+  "feed": {
+    "url": "https://feeds.feedburner.com/alabamareflector/0zGtsmkibDb",
+    "title": "Alabama Reflector",
+    "link": "https://alabamareflector.com",
+    "description": "Latest news from the Alabama Reflector",
+    "author": "Alabama Reflector"
+  },
+  "items": [
+    {
+      "title": "States are quietly cutting child care funding — and families are out of options",
+      "link": "https://alabamareflector.com/2025/11/08/states-are-quietly-cutting-child-care-funding-and-families-are-out-of-options/",
+      "description": "For the past year, families in need of child care assistance in Indiana have been sitting on a waitlist — with no end in sight.",
+      "content": "<p><img src='https://alabamareflector.com/wp-content/uploads/2025/11/childcare-funding.jpg' /></p>",
+      "thumbnail": "https://alabamareflector.com/wp-content/uploads/2025/11/childcare-funding.jpg"
+    },
+    {
+      "title": "US Supreme Court temporarily blocks November SNAP payments",
+      "link": "https://alabamareflector.com/2025/11/08/us-supreme-court-temporarily-blocks-november-snap-payments/",
+      "description": "The U.S. Supreme Court temporarily blocked Friday night a lower court’s order that the Trump administration pay for a full month of food benefits.",
+      "content": "<p><img src='https://alabamareflector.com/wp-content/uploads/2025/11/snap-court.jpg' /></p>",
+      "thumbnail": "https://alabamareflector.com/wp-content/uploads/2025/11/snap-court.jpg"
+    },
+    {
+      "title": "Alabama lawmakers discuss new healthcare funding proposal",
+      "link": "https://alabamareflector.com/2025/11/07/alabama-lawmakers-discuss-new-healthcare-funding-proposal/",
+      "description": "The Alabama legislature is expected to debate a new healthcare funding plan next week.",
+      "content": "<p><img src='https://alabamareflector.com/wp-content/uploads/2025/11/alabama-healthcare.jpg' /></p>",
+      "thumbnail": "https://alabamareflector.com/wp-content/uploads/2025/11/alabama-healthcare.jpg"
+    },
+    {
+      "title": "Montgomery officials celebrate new downtown revitalization effort",
+      "link": "https://alabamareflector.com/2025/11/07/montgomery-officials-celebrate-downtown-revitalization/",
+      "description": "City leaders say the project could bring hundreds of jobs and new housing opportunities.",
+      "content": "<p><img src='https://alabamareflector.com/wp-content/uploads/2025/11/montgomery-revitalization.jpg' /></p>",
+      "thumbnail": "https://alabamareflector.com/wp-content/uploads/2025/11/montgomery-revitalization.jpg"
+    }
+  ]
+}
