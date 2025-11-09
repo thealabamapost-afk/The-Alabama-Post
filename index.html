@@ -65,12 +65,7 @@ h2 {
   height: 200px;
   object-fit: cover;
   border-bottom: 3px solid #b91c1c;
-  background: #f3f3f3;
-  opacity: 0;
-  transition: opacity 0.6s ease-in;
-}
-.reflector-article img.loaded {
-  opacity: 1;
+  background: #f3f3f3; /* light gray if nothing loads */
 }
 .reflector-article-content {
   padding: 18px 20px 25px;
@@ -146,20 +141,16 @@ footer {
 </footer>
 
 <script>
-const FALLBACK_IMAGE = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
-const PROXY = "https://image.thum.io/get/width/700/crop/700/"; // auto-thumbnail proxy
+const FALLBACK_IMAGE =
+  "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
 
 const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
 const updated = document.getElementById("lastUpdated");
 
-// Detect JSON path
+// Auto-detect reflector.json path
 const BASE_PATH = window.location.pathname.replace(/\/[^/]*$/, '');
 const FEED_URL = `${BASE_PATH}/reflector.json`;
-
-function getThumbnail(link) {
-  return PROXY + encodeURIComponent(link);
-}
 
 async function loadFeed() {
   spinner.style.display = "inline-block";
@@ -177,7 +168,11 @@ async function loadFeed() {
     }
 
     data.items.slice(0, 9).forEach(item => {
-      const image = getThumbnail(item.link); // pulls live screenshot thumbnail
+      const imgUrl =
+        item.thumbnail && item.thumbnail.trim() !== ""
+          ? item.thumbnail
+          : FALLBACK_IMAGE;
+
       const cleanDesc = item.description
         ? item.description.replace(/<[^>]*>?/gm, "").substring(0, 250)
         : "";
@@ -185,7 +180,7 @@ async function loadFeed() {
       const card = document.createElement("div");
       card.classList.add("reflector-article");
       card.innerHTML = `
-        <img src="${image}" alt="Article Thumbnail" loading="lazy" onload="this.classList.add('loaded')" onerror="this.src='${FALLBACK_IMAGE}'" />
+        <img src="${imgUrl}" alt="Article image" loading="lazy" />
         <div class="reflector-article-content">
           <a href="${item.link}" target="_blank">${item.title}</a>
           <p>${cleanDesc}...</p>
@@ -204,8 +199,9 @@ async function loadFeed() {
   }
 }
 
+// initial load + refresh every 6 hours
 loadFeed();
-setInterval(loadFeed, 21600000); // refresh every 6 hours
+setInterval(loadFeed, 21600000);
 </script>
 </body>
 </html>
