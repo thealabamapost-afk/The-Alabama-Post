@@ -147,7 +147,7 @@ footer {
 
 <script>
 const FALLBACK_IMAGE = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
-const PROXY = "https://wsrv.nl/?url=";
+const PROXY = "https://images.weserv.nl/?url="; // ✅ fixed proxy
 const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
 const updated = document.getElementById("lastUpdated");
@@ -156,11 +156,11 @@ const updated = document.getElementById("lastUpdated");
 const BASE_PATH = window.location.pathname.replace(/\/[^/]*$/, '');
 const FEED_URL = `${BASE_PATH}/reflector.json`;
 
-// ✅ FIXED: Proxy encoder for CORS-safe image loading
+// Proxy function (GitHub-safe)
 function proxyImage(url) {
   if (!url) return FALLBACK_IMAGE;
   const clean = url.replace(/^https?:\/\//, '');
-  return `${PROXY}${encodeURIComponent('https://' + clean)}?output=webp&default=${encodeURIComponent(FALLBACK_IMAGE)}`;
+  return `${PROXY}${clean}`;
 }
 
 async function loadFeed() {
@@ -198,7 +198,7 @@ async function loadFeed() {
       feed.appendChild(card);
     });
 
-    // Smooth image fade-in
+    // Fade-in when each image finishes loading
     document.querySelectorAll('.reflector-article img').forEach(img => {
       img.addEventListener('load', () => img.classList.add('loaded'));
     });
@@ -213,7 +213,7 @@ async function loadFeed() {
   }
 }
 
-// Load initially and every 6 hours (21600000 ms)
+// Load initially and refresh every 6 hours (21600000 ms)
 loadFeed();
 setInterval(loadFeed, 21600000);
 </script>
