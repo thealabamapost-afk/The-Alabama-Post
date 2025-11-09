@@ -147,6 +147,7 @@ footer {
 <script>
 const FALLBACK_IMAGE =
   "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
+const IMAGE_PROXY = "https://wsrv.nl/?url=";
 
 const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
@@ -172,9 +173,10 @@ async function loadFeed() {
     }
 
     data.items.slice(0, 9).forEach(item => {
-      // ✅ Secure Thum.io preview (forces HTTPS and caching)
-      const imgUrl = "https://image.thum.io/get/auth/8619-width/700/crop/700/https://" +
-        item.link.replace(/^https?:\/\//, '');
+      // ✅ Use wsrv.nl proxy to bypass Reflector hotlink protection
+      const imgUrl = item.thumbnail
+        ? IMAGE_PROXY + encodeURIComponent(item.thumbnail)
+        : FALLBACK_IMAGE;
 
       const cleanDesc = item.description
         ? item.description.replace(/<[^>]*>?/gm, "").substring(0, 250)
@@ -183,7 +185,7 @@ async function loadFeed() {
       const card = document.createElement("div");
       card.classList.add("reflector-article");
       card.innerHTML = `
-        <img src="${imgUrl}" alt="Article preview" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'" />
+        <img src="${imgUrl}" alt="Article image" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'" />
         <div class="reflector-article-content">
           <a href="${item.link}" target="_blank">${item.title}</a>
           <p>${cleanDesc}...</p>
