@@ -147,42 +147,52 @@ const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
 const updated = document.getElementById("lastUpdated");
 
-// ✅ Auto-detect correct JSON path even on GitHub Pages
-const BASE_PATH = window.location.pathname.replace(/\/[^/]*$/, '');
-const FEED_URL = `${BASE_PATH}/reflector.json`;
+// ✅ Detect correct reflector.json URL for GitHub Pages
+let FEED_URL = "reflector.json";
+if (window.location.hostname.includes("github.io")) {
+  const pathParts = window.location.pathname.split("/").filter(Boolean);
+  if (pathParts.length >= 1) {
+    const repo = pathParts[0];
+    FEED_URL = `/${repo}/reflector.json`;
+  }
+}
 
+// ✅ Helper: extract image from HTML if no thumbnail provided
 function extractImage(html) {
-  const match = html.match(/<img[^>]+src="([^"]+)"/);
+  const match = html?.match(/<img[^>]+src="([^"]+)"/i);
   return match ? match[1] : FALLBACK_IMAGE;
 }
 
 async function loadFeed() {
   spinner.style.display = "inline-block";
   feed.innerHTML = "";
+
   try {
     const res = await fetch(FEED_URL, { cache: "no-store" });
-    if (!res.ok) throw new Error("Bad response");
+    if (!res.ok) throw new Error(`Failed to load: ${res.status}`);
     const data = await res.json();
     spinner.style.display = "none";
 
-    if (!data.items || !data.items.length) {
+    if (!data.items || data.items.length === 0) {
       feed.innerHTML = "<p>No articles found.</p>";
       return;
     }
 
     data.items.slice(0, 8).forEach(item => {
-      const image = item.thumbnail || extractImage(item.content || "") || FALLBACK_IMAGE;
-      const cleanDesc = item.description
-        ? item.description.replace(/<[^>]*>?/gm, "").substring(0, 250)
-        : "";
+      const image = item.thumbnail || extractImage(item.content || item.description || "");
+      const cleanDesc = (item.description || "").replace(/<[^>]*>?/gm, "").substring(0, 250);
+
       const card = document.createElement("div");
       card.classList.add("reflector-article");
       card.innerHTML = `
-        <img src="${image}" alt="Article Image" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'" />
+        <img src="${image}" alt="Article Image" loading="lazy"
+             onerror="this.src='${FALLBACK_IMAGE}'" />
         <div class="reflector-article-content">
-          <a href="${item.link}" target="_blank">${item.title}</a>
+          <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>
           <p>${cleanDesc}...</p>
-          <p class="credit">Source: <a href="https://alabamareflector.com" target="_blank">Alabama Reflector</a></p>
+          <p class="credit">Source: 
+            <a href="https://alabamareflector.com" target="_blank">Alabama Reflector</a>
+          </p>
         </div>`;
       feed.appendChild(card);
     });
@@ -190,12 +200,14 @@ async function loadFeed() {
     updated.textContent =
       "Last Updated: " +
       new Date().toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" });
+
   } catch (err) {
     spinner.style.display = "none";
     feed.innerHTML = "<p>Failed to load feed.</p>";
-    console.error("Error loading feed:", err);
+    console.error("❌ Error loading reflector.json:", err);
   }
 }
+
 loadFeed();
 </script>
 </body>
