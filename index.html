@@ -147,7 +147,10 @@ footer {
 
 <script>
 const FALLBACK_IMAGE = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
-const PROXY = "https://images.weserv.nl/?url=";
+
+// ✅ Use proxy.garden to safely rehost images (GitHub Pages compatible)
+const PROXY = "https://proxy.garden/?url=";
+
 const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
 const updated = document.getElementById("lastUpdated");
@@ -156,12 +159,11 @@ const updated = document.getElementById("lastUpdated");
 const BASE_PATH = window.location.pathname.replace(/\/[^/]*$/, '');
 const FEED_URL = `${BASE_PATH}/reflector.json`;
 
-// ✅ Fixed proxy function for GitHub Pages
+// Proxy function
 function proxyImage(url) {
   if (!url) return FALLBACK_IMAGE;
   const clean = url.replace(/^https?:\/\//, '');
-  // Make sure it’s encoded properly and served securely
-  return `${PROXY}${encodeURIComponent(clean)}&default=${encodeURIComponent(FALLBACK_IMAGE)}&output=webp`;
+  return `${PROXY}${encodeURIComponent('https://' + clean)}`;
 }
 
 async function loadFeed() {
