@@ -3,24 +3,25 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>The Alabama Post | Reflector News Feed</title>
+<title>The Alabama Post | Alabama Reflector Feed</title>
 
-<meta property="og:image" content="https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png">
 <meta property="og:title" content="The Alabama Post | From the Alabama Reflector">
 <meta property="og:description" content="Latest news from The Alabama Reflector, updated live on The Alabama Post.">
+<meta property="og:image" content="https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png">
 
 <style>
 body {
-  margin: 0;
-  font-family: "Inter","Segoe UI",Arial,sans-serif;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
   background: #f9fafb;
   color: #111827;
+  margin: 0;
+  padding: 0;
+  text-align: center;
 }
 header {
   background: #111827;
-  color: #fff;
-  text-align: center;
-  padding: 35px 0 30px;
+  color: white;
+  padding: 30px 0 25px;
   box-shadow: 0 3px 6px rgba(0,0,0,0.2);
 }
 header h1 {
@@ -30,203 +31,165 @@ header h1 {
 }
 header p {
   color: #d1d5db;
-  margin-top: 5px;
-  font-size: 1rem;
+  margin: 8px 0 0;
 }
-.reflector {
-  background: #fff;
-  border-radius: 12px;
-  padding: 40px 35px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-  text-align: center;
-  margin: 50px auto;
-  max-width: 1150px;
-}
-.reflector h2 {
-  font-size: 2.1rem;
-  font-weight: 800;
+h2 {
   color: #b91c1c;
+  font-size: 2rem;
+  margin-top: 40px;
+  display: inline-block;
   border-bottom: 4px solid #b91c1c;
-  padding-bottom: 10px;
-  margin-bottom: 30px;
-  display: inline-block;
+  padding-bottom: 6px;
 }
-.updated {
-  font-size: 0.95rem;
-  color: #6b7280;
-  margin-bottom: 35px;
-}
-.spinner {
-  display: inline-block;
-  width: 40px;
-  height: 40px;
-  border: 4px solid #b91c1c;
-  border-top: 4px solid transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-top: 15px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.reflector-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 35px;
+#reflectorFeed {
+  display: flex;
+  flex-wrap: wrap;
   justify-content: center;
+  gap: 30px;
+  padding: 40px 20px;
 }
 .reflector-article {
-  background: #f9fafb;
+  background: #fff;
   border-radius: 12px;
-  overflow: hidden;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 320px;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  text-align: left;
 }
 .reflector-article:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.15);
 }
 .reflector-article img {
   width: 100%;
-  height: 240px;
+  height: 200px;
   object-fit: cover;
-  display: block;
   border-bottom: 3px solid #b91c1c;
-  background: #f1f1f1;
+  background: #f3f3f3;
 }
 .reflector-article-content {
-  text-align: left;
-  padding: 20px 22px 25px;
+  padding: 18px 20px 25px;
 }
-.reflector-article a {
-  text-decoration: none;
+.reflector-article-content a {
   color: #b91c1c;
   font-weight: 700;
-  font-size: 1.3rem;
-  line-height: 1.5;
+  text-decoration: none;
+  font-size: 1.2rem;
+  display: block;
+  margin-bottom: 8px;
 }
-.reflector-article a:hover { text-decoration: underline; }
-.reflector-article p {
-  margin-top: 10px;
+.reflector-article-content a:hover {
+  text-decoration: underline;
+}
+.reflector-article-content p {
   color: #374151;
-  font-size: 1.05rem;
-  line-height: 1.7;
+  font-size: 0.98rem;
+  line-height: 1.6;
 }
 .credit {
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   color: #6b7280;
   margin-top: 10px;
 }
-.more-btn {
-  display: inline-block;
-  margin-top: 35px;
-  padding: 12px 26px;
-  background: #b91c1c;
-  color: #fff;
-  text-decoration: none;
-  border-radius: 6px;
-  font-weight: 600;
-  transition: background 0.2s ease;
+#loadingSpinner {
+  display: none;
+  font-size: 1rem;
+  color: #b91c1c;
 }
-.more-btn:hover { background: #991b1b; }
+#lastUpdated {
+  color: #555;
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+}
+.more-btn {
+  background: #b91c1c;
+  color: white;
+  text-decoration: none;
+  padding: 12px 26px;
+  border-radius: 8px;
+  font-weight: 600;
+  display: inline-block;
+  transition: background 0.25s ease;
+  margin-bottom: 50px;
+}
+.more-btn:hover {
+  background: #991b1b;
+}
 footer {
   text-align: center;
   color: #9ca3af;
   font-size: 0.9rem;
-  padding: 20px 0;
-  margin-top: 60px;
   background: #111827;
+  padding: 20px 0;
 }
 </style>
 </head>
 <body>
-
 <header>
   <h1>The Alabama Post</h1>
   <p>Independent • Honest • Fearless Journalism</p>
 </header>
 
-<div class="reflector">
-  <h2>From the Alabama Reflector</h2>
-  <p class="updated" id="lastUpdated">Loading latest update...</p>
-  <div id="loadingSpinner" class="spinner"></div>
-  <div class="reflector-grid" id="reflectorFeed"></div>
-  <a href="https://alabamareflector.com" target="_blank" class="more-btn">View More from Alabama Reflector →</a>
-</div>
+<h2>From the Alabama Reflector</h2>
+<p id="lastUpdated">Loading latest update…</p>
+<div id="loadingSpinner">Loading...</div>
+<div id="reflectorFeed"></div>
+<a href="https://alabamareflector.com" target="_blank" class="more-btn">View More from Alabama Reflector →</a>
 
 <footer>
   © 2025 The Alabama Post | Decatur, Alabama | “Where Truth Meets Independence”
 </footer>
 
 <script>
-const FEED_URL = "https://alabamareflector.com/feed/";
+const FEED_URL = "./reflector.json";
 const FALLBACK_IMAGE = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
-const IMAGE_PROXY = "https://images.weserv.nl/?url=";
-const HTML_PROXY = "https://r.jina.ai/http://"; // reliable HTML fetch proxy
 const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
 const updated = document.getElementById("lastUpdated");
 
-async function fetchOGImage(url) {
-  try {
-    const cleanUrl = url.replace(/^https:\/\//i, "").replace(/^http:\/\//i, "");
-    const response = await fetch(HTML_PROXY + cleanUrl);
-    const html = await response.text();
-    const match = html.match(/<meta property="og:image" content="([^"]+)"/i);
-    if (match) return match[1].replace(/^http:\/\//i, "https://");
-  } catch (err) {
-    console.warn("Could not fetch OG image for", url);
-  }
-  return FALLBACK_IMAGE;
+function extractImage(html) {
+  const match = html.match(/<img[^>]+src="([^"]+)"/);
+  return match ? match[1] : FALLBACK_IMAGE;
 }
 
 async function loadFeed() {
   spinner.style.display = "inline-block";
   feed.innerHTML = "";
-
   try {
-    const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(FEED_URL)}`);
+    const res = await fetch(FEED_URL);
     const data = await res.json();
     spinner.style.display = "none";
-
-    if (!data.items || data.items.length === 0) {
-      feed.innerHTML = "<p>No stories found. Please check again soon.</p>";
+    if (!data.items || !data.items.length) {
+      feed.innerHTML = "<p>No articles found.</p>";
       return;
     }
-
-    for (const item of data.items.slice(0, 8)) {
-      let image = "";
-      if (item.enclosure && item.enclosure.link) {
-        image = item.enclosure.link;
-      } else {
-        const match = item.description.match(/<img[^>]+src="([^">]+)"/);
-        if (match) image = match[1];
-      }
-
-      if (!image) image = await fetchOGImage(item.link);
-      image = image.replace(/^http:\/\//i, "https://");
-      const proxied = IMAGE_PROXY + encodeURIComponent(image);
-
-      const div = document.createElement("div");
-      div.classList.add("reflector-article");
-      div.innerHTML = `
-        <img src="${proxied}" alt="Article Image" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'" />
+    data.items.slice(0, 8).forEach(item => {
+      const image = item.thumbnail || extractImage(item.content || "") || FALLBACK_IMAGE;
+      const cleanDesc = item.description
+        ? item.description.replace(/<[^>]*>?/gm, "").substring(0, 250)
+        : "";
+      const card = document.createElement("div");
+      card.classList.add("reflector-article");
+      card.innerHTML = `
+        <img src="${image}" alt="Article Image" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'" />
         <div class="reflector-article-content">
           <a href="${item.link}" target="_blank">${item.title}</a>
-          <p>${item.description.replace(/<[^>]*>?/gm,"").substring(0,250)}...</p>
+          <p>${cleanDesc}...</p>
           <p class="credit">Source: <a href="https://alabamareflector.com" target="_blank">Alabama Reflector</a></p>
         </div>`;
-      feed.appendChild(div);
-    }
-
-    updated.textContent = "Last Updated: " + new Date().toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" });
-  } catch (e) {
-    console.error("Feed load error:", e);
+      feed.appendChild(card);
+    });
+    updated.textContent =
+      "Last Updated: " +
+      new Date().toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" });
+  } catch (err) {
     spinner.style.display = "none";
-    feed.innerHTML = "<p>Unable to load Alabama Reflector stories right now.</p>";
+    feed.innerHTML = "<p>Failed to load feed.</p>";
+    console.error("Error loading feed:", err);
   }
 }
-
 loadFeed();
-setInterval(loadFeed, 7200000);
 </script>
 </body>
 </html>
