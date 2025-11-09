@@ -147,21 +147,18 @@ footer {
 
 <script>
 const FALLBACK_IMAGE = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
-
-// ✅ New: Using thum.io for CORS-safe, no-upload images
-const PROXY = "https://image.thum.io/get/width/600/crop/600/";
+const PROXY = "https://image.thum.io/get/width/700/crop/700/"; // auto-thumbnail proxy
 
 const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
 const updated = document.getElementById("lastUpdated");
 
-// Auto-detect reflector.json path
+// Detect JSON path
 const BASE_PATH = window.location.pathname.replace(/\/[^/]*$/, '');
 const FEED_URL = `${BASE_PATH}/reflector.json`;
 
-function proxyImage(url) {
-  if (!url) return FALLBACK_IMAGE;
-  return PROXY + encodeURIComponent(url);
+function getThumbnail(link) {
+  return PROXY + encodeURIComponent(link);
 }
 
 async function loadFeed() {
@@ -180,9 +177,7 @@ async function loadFeed() {
     }
 
     data.items.slice(0, 9).forEach(item => {
-      const rawImg = item.thumbnail || FALLBACK_IMAGE;
-      const image = proxyImage(rawImg);
-
+      const image = getThumbnail(item.link); // pulls live screenshot thumbnail
       const cleanDesc = item.description
         ? item.description.replace(/<[^>]*>?/gm, "").substring(0, 250)
         : "";
@@ -190,17 +185,13 @@ async function loadFeed() {
       const card = document.createElement("div");
       card.classList.add("reflector-article");
       card.innerHTML = `
-        <img src="${image}" alt="Article Image" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'" />
+        <img src="${image}" alt="Article Thumbnail" loading="lazy" onload="this.classList.add('loaded')" onerror="this.src='${FALLBACK_IMAGE}'" />
         <div class="reflector-article-content">
           <a href="${item.link}" target="_blank">${item.title}</a>
           <p>${cleanDesc}...</p>
           <p class="credit">Source: <a href="https://alabamareflector.com" target="_blank">Alabama Reflector</a></p>
         </div>`;
       feed.appendChild(card);
-    });
-
-    document.querySelectorAll('.reflector-article img').forEach(img => {
-      img.addEventListener('load', () => img.classList.add('loaded'));
     });
 
     updated.textContent =
@@ -213,9 +204,8 @@ async function loadFeed() {
   }
 }
 
-// Load now and every 6 hours (21600000 ms)
 loadFeed();
-setInterval(loadFeed, 21600000);
+setInterval(loadFeed, 21600000); // refresh every 6 hours
 </script>
 </body>
 </html>
