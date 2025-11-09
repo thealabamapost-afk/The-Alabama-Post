@@ -65,7 +65,7 @@ h2 {
   height: 200px;
   object-fit: cover;
   border-bottom: 3px solid #b91c1c;
-  background: #f3f3f3; /* light gray if nothing loads */
+  background: #f3f3f3;
 }
 .reflector-article-content {
   padding: 18px 20px 25px;
@@ -141,14 +141,14 @@ footer {
 </footer>
 
 <script>
-const FALLBACK_IMAGE =
-  "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
+const FALLBACK_IMAGE = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
+const PROXY = "https://wsrv.nl/?url="; // Bypass Reflector’s CORS/hotlink block
 
 const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
 const updated = document.getElementById("lastUpdated");
 
-// Auto-detect reflector.json path
+// Detect reflector.json path
 const BASE_PATH = window.location.pathname.replace(/\/[^/]*$/, '');
 const FEED_URL = `${BASE_PATH}/reflector.json`;
 
@@ -168,10 +168,9 @@ async function loadFeed() {
     }
 
     data.items.slice(0, 9).forEach(item => {
-      const imgUrl =
-        item.thumbnail && item.thumbnail.trim() !== ""
-          ? item.thumbnail
-          : FALLBACK_IMAGE;
+      const imgUrl = item.thumbnail && item.thumbnail.trim() !== ""
+        ? PROXY + encodeURIComponent(item.thumbnail)
+        : FALLBACK_IMAGE;
 
       const cleanDesc = item.description
         ? item.description.replace(/<[^>]*>?/gm, "").substring(0, 250)
