@@ -145,7 +145,8 @@ footer {
 </footer>
 
 <script>
-const FALLBACK_IMAGE = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
+const FALLBACK_IMAGE =
+  "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
 
 const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
@@ -171,8 +172,9 @@ async function loadFeed() {
     }
 
     data.items.slice(0, 9).forEach(item => {
-      // Use Thum.io for live previews instead of blocked Reflector images
-      const imgUrl = "https://image.thum.io/get/width/700/crop/700/" + encodeURIComponent(item.link);
+      // ✅ Secure Thum.io preview (forces HTTPS and caching)
+      const imgUrl = "https://image.thum.io/get/auth/8619-width/700/crop/700/https://" +
+        item.link.replace(/^https?:\/\//, '');
 
       const cleanDesc = item.description
         ? item.description.replace(/<[^>]*>?/gm, "").substring(0, 250)
@@ -200,7 +202,7 @@ async function loadFeed() {
   }
 }
 
-// initial load + refresh every 6 hours
+// Initial load + refresh every 6 hours
 loadFeed();
 setInterval(loadFeed, 21600000);
 </script>
