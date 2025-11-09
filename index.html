@@ -157,68 +157,63 @@ footer {
 </footer>
 
 <script>
-const API_KEY = "kowavs2lr19xrqnlsdesyot0aphugzv8mjnhrt4v";
-const FEED_URL = "https://feeds.feedburner.com/alabamareflector/0zGtsmkibDb";
+// ✅ Direct Alabama Reflector RSS feed (faster, no Feedburner delay)
+const FEED_URL = "https://alabamareflector.com/feed/";
 const FALLBACK_IMAGE = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
-const PROXY = "https://imgp.uk/"; // ✅ universal image proxy
+const PROXY = "https://imgp.uk/"; // Universal proxy
 const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
 const updated = document.getElementById("lastUpdated");
-
-async function fetchArticleImage(link) {
-  try {
-    const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(link)}`);
-    const data = await response.json();
-    const match = data.contents.match(/<meta property="og:image" content="([^"]+)"/i);
-    if (match) return match[1].replace(/^http:\/\//i, "https://");
-  } catch (e) {
-    console.warn("No og:image for", link);
-  }
-  return FALLBACK_IMAGE;
-}
 
 async function loadFeed() {
   spinner.style.display = "inline-block";
   feed.innerHTML = "";
 
   try {
-    const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(FEED_URL)}&api_key=${API_KEY}`);
+    // Use AllOrigins for instant CORS bypass
+    const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(FEED_URL)}`);
     const data = await res.json();
-    spinner.style.display = "none";
 
-    if (!data.items || data.items.length === 0) {
+    // Parse raw RSS XML
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(data.contents, "text/xml");
+    const items = xml.querySelectorAll("item");
+
+    spinner.style.display = "none";
+    if (items.length === 0) {
       feed.innerHTML = "<p>No stories found. Please check again soon.</p>";
       return;
     }
 
-    for (const item of data.items.slice(0, 8)) {
+    items.forEach((item, index) => {
+      if (index >= 8) return;
+
+      const title = item.querySelector("title")?.textContent || "Untitled";
+      const link = item.querySelector("link")?.textContent || "#";
+      const description = item.querySelector("description")?.textContent || "";
       let image = "";
-      if (item.enclosure && item.enclosure.link) {
-        image = item.enclosure.link;
-      } else {
-        const match = item.description.match(/<img[^>]+src="([^">]+)"/);
-        if (match) image = match[1];
-      }
 
-      if (!image) image = await fetchArticleImage(item.link);
+      // Extract image from <content:encoded> or description
+      const content = item.getElementsByTagName("content:encoded")[0]?.textContent || description;
+      const imgMatch = content.match(/<img[^>]+src="([^">]+)"/);
+      if (imgMatch) image = imgMatch[1];
+
+      if (!image) image = FALLBACK_IMAGE;
       image = image.replace(/^http:\/\//i, "https://");
-
-      // 🔥 Final image rewrite with proxy that always works
       const proxied = `${PROXY}${encodeURIComponent(image)}`;
 
       const article = document.createElement("div");
       article.classList.add("reflector-article");
       article.innerHTML = `
-        <img src="${proxied}" alt="Article Image" loading="lazy"
-             onerror="this.src='${FALLBACK_IMAGE}'" />
+        <img src="${proxied}" alt="Article Image" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'" />
         <div class="reflector-article-content">
-          <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>
-          <p>${item.description.replace(/<[^>]*>?/gm,"").substring(0,250)}...</p>
+          <a href="${link}" target="_blank" rel="noopener noreferrer">${title}</a>
+          <p>${description.replace(/<[^>]*>?/gm,"").substring(0,250)}...</p>
           <p class="credit">Source: <a href="https://alabamareflector.com" target="_blank" rel="noopener noreferrer">Alabama Reflector</a></p>
         </div>
       `;
       feed.appendChild(article);
-    }
+    });
 
     updated.textContent =
       "Last Updated: " +
@@ -231,7 +226,7 @@ async function loadFeed() {
 }
 
 loadFeed();
-setInterval(loadFeed, 7200000);
+setInterval(loadFeed, 7200000); // Refresh every 2h
 </script>
 </body>
 </html>
