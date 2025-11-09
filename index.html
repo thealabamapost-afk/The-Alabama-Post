@@ -66,6 +66,10 @@ h2 {
   object-fit: cover;
   border-bottom: 3px solid #b91c1c;
   background: #f3f3f3;
+  transition: opacity 0.4s ease-in-out;
+}
+.reflector-article img:hover {
+  opacity: 0.9;
 }
 .reflector-article-content {
   padding: 18px 20px 25px;
@@ -142,13 +146,12 @@ footer {
 
 <script>
 const FALLBACK_IMAGE = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
-const PROXY = "https://wsrv.nl/?url="; // Bypass Reflector’s CORS/hotlink block
 
 const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
 const updated = document.getElementById("lastUpdated");
 
-// Detect reflector.json path
+// Detect reflector.json path automatically
 const BASE_PATH = window.location.pathname.replace(/\/[^/]*$/, '');
 const FEED_URL = `${BASE_PATH}/reflector.json`;
 
@@ -168,9 +171,8 @@ async function loadFeed() {
     }
 
     data.items.slice(0, 9).forEach(item => {
-      const imgUrl = item.thumbnail && item.thumbnail.trim() !== ""
-        ? PROXY + encodeURIComponent(item.thumbnail)
-        : FALLBACK_IMAGE;
+      // Use Thum.io for live previews instead of blocked Reflector images
+      const imgUrl = "https://image.thum.io/get/width/700/crop/700/" + encodeURIComponent(item.link);
 
       const cleanDesc = item.description
         ? item.description.replace(/<[^>]*>?/gm, "").substring(0, 250)
@@ -179,7 +181,7 @@ async function loadFeed() {
       const card = document.createElement("div");
       card.classList.add("reflector-article");
       card.innerHTML = `
-        <img src="${imgUrl}" alt="Article image" loading="lazy" />
+        <img src="${imgUrl}" alt="Article preview" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'" />
         <div class="reflector-article-content">
           <a href="${item.link}" target="_blank">${item.title}</a>
           <p>${cleanDesc}...</p>
