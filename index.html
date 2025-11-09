@@ -169,6 +169,19 @@ const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
 const updated = document.getElementById("lastUpdated");
 
+// Get og:image directly from article HTML if RSS doesn't include one
+async function fetchArticleImage(link) {
+  try {
+    const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(link)}`);
+    const data = await response.json();
+    const match = data.contents.match(/<meta property="og:image" content="([^"]+)"/i);
+    if (match) return match[1].replace(/^http:\/\//i, "https://");
+  } catch (e) {
+    console.warn("No og:image for", link);
+  }
+  return FALLBACK_IMAGE;
+}
+
 async function loadFeed() {
   spinner.style.display = "inline-block";
   feed.innerHTML = "";
@@ -183,9 +196,10 @@ async function loadFeed() {
       return;
     }
 
-    data.items.slice(0, 8).forEach(item => {
+    for (const item of data.items.slice(0, 8)) {
       let image = "";
 
+      // Try enclosure or inline first
       if (item.enclosure && item.enclosure.link) {
         image = item.enclosure.link;
       } else {
@@ -193,8 +207,12 @@ async function loadFeed() {
         if (match) image = match[1];
       }
 
-      if (!image) image = FALLBACK_IMAGE;
+      // Fallback: fetch from article HTML
+      if (!image) {
+        image = await fetchArticleImage(item.link);
+      }
 
+      // Finalize
       image = image.replace(/^http:\/\//i, "https://");
       const proxied = `${PROXY}${encodeURIComponent(image)}`;
 
@@ -209,13 +227,11 @@ async function loadFeed() {
         </div>
       `;
       feed.appendChild(article);
-    });
+    }
 
-    updated.textContent = "Last Updated: " + new Date().toLocaleString("en-US", {
-      dateStyle: "long",
-      timeStyle: "short"
-    });
-
+    updated.textContent =
+      "Last Updated: " +
+      new Date().toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" });
   } catch (error) {
     console.error(error);
     spinner.style.display = "none";
