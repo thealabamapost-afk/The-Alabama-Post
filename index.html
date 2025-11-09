@@ -159,75 +159,62 @@ footer {
 <script>
 const FEED_URL = "https://alabamareflector.com/feed/";
 const FALLBACK_IMAGE = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
-const IMAGE_PROXY = "https://images.weserv.nl/?url="; // GitHub-safe proxy
+const IMAGE_PROXY = "https://images.weserv.nl/?url=";
 const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
 const updated = document.getElementById("lastUpdated");
 
-// small pause helper to avoid hitting proxy too fast
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-async function fetchOgImage(link) {
-  try {
-    const r = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(link)}`);
-    const d = await r.json();
-    const m = d.contents.match(/<meta property="og:image" content="([^"]+)"/i);
-    if (m) return m[1].replace(/^http:\/\//i, "https://");
-  } catch {}
-  return FALLBACK_IMAGE;
-}
-
+// RSS2JSON with fallback proxy
 async function loadFeed() {
   spinner.style.display = "inline-block";
   feed.innerHTML = "";
 
   try {
-    const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(FEED_URL)}`);
+    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(FEED_URL)}`;
+    const res = await fetch(apiUrl);
     const data = await res.json();
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(data.contents, "text/xml");
-    const items = xml.querySelectorAll("item");
     spinner.style.display = "none";
 
-    if (!items.length) {
+    if (!data.items || data.items.length === 0) {
       feed.innerHTML = "<p>No stories found. Please check again soon.</p>";
       return;
     }
 
-    for (let i = 0; i < Math.min(items.length, 8); i++) {
-      const item = items[i];
-      const title = item.querySelector("title")?.textContent || "Untitled";
-      const link = item.querySelector("link")?.textContent || "#";
-      const desc = item.querySelector("description")?.textContent || "";
-      const content = item.getElementsByTagName("content:encoded")[0]?.textContent || desc;
+    data.items.slice(0, 8).forEach(item => {
+      let image = "";
 
-      let img = "";
-      const match = content.match(/<img[^>]+src="([^">]+)"/);
-      if (match) img = match[1];
-
-      if (!img) {
-        img = await fetchOgImage(link);
-        await sleep(200); // space out requests slightly
+      // Try enclosure or inline first
+      if (item.enclosure && item.enclosure.link) {
+        image = item.enclosure.link;
+      } else {
+        const match = item.description.match(/<img[^>]+src="([^">]+)"/);
+        if (match) image = match[1];
       }
 
-      img = img.replace(/^http:\/\//i, "https://");
-      const proxied = IMAGE_PROXY + encodeURIComponent(img);
+      // fallback if not found
+      if (!image) image = FALLBACK_IMAGE;
 
-      const div = document.createElement("div");
-      div.className = "reflector-article";
-      div.innerHTML = `
+      image = image.replace(/^http:\/\//i, "https://");
+      const proxied = `${IMAGE_PROXY}${encodeURIComponent(image)}`;
+
+      const article = document.createElement("div");
+      article.classList.add("reflector-article");
+      article.innerHTML = `
         <img src="${proxied}" alt="Article Image" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'" />
         <div class="reflector-article-content">
-          <a href="${link}" target="_blank" rel="noopener noreferrer">${title}</a>
-          <p>${desc.replace(/<[^>]*>?/gm, "").substring(0,250)}...</p>
-          <p class="credit">Source: <a href="https://alabamareflector.com" target="_blank">Alabama Reflector</a></p>
-        </div>`;
-      feed.appendChild(div);
-    }
+          <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>
+          <p>${item.description.replace(/<[^>]*>?/gm,"").substring(0,250)}...</p>
+          <p class="credit">Source: <a href="https://alabamareflector.com" target="_blank" rel="noopener noreferrer">Alabama Reflector</a></p>
+        </div>
+      `;
+      feed.appendChild(article);
+    });
 
-    updated.textContent = "Last Updated: " + new Date().toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" });
-  } catch (e) {
-    console.error(e);
+    updated.textContent =
+      "Last Updated: " +
+      new Date().toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" });
+  } catch (error) {
+    console.error(error);
     spinner.style.display = "none";
     feed.innerHTML = "<p>Unable to load Alabama Reflector stories right now.</p>";
   }
