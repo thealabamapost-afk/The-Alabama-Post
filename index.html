@@ -147,8 +147,7 @@ footer {
 <script>
 const FALLBACK_IMAGE =
   "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
-const WSRV_PROXY = "https://wsrv.nl/?url=";
-const THUMIO = "https://image.thum.io/get/width/700/crop/700/";
+const IMAGE_PROXY = "https://images.weserv.nl/?url="; // better, universal proxy
 
 const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
@@ -174,10 +173,9 @@ async function loadFeed() {
     }
 
     data.items.slice(0, 9).forEach(item => {
-      // Try wsrv.nl first, fallback to thum.io if blocked
-      const wsrvImg = item.thumbnail ? WSRV_PROXY + encodeURIComponent(item.thumbnail) : "";
-      const thumioImg = THUMIO + encodeURIComponent(item.link);
-      const imgUrl = wsrvImg || thumioImg;
+      const imgUrl = item.thumbnail
+        ? IMAGE_PROXY + encodeURIComponent(item.thumbnail) + "&h=400&fit=cover&default=404"
+        : FALLBACK_IMAGE;
 
       const cleanDesc = item.description
         ? item.description.replace(/<[^>]*>?/gm, "").substring(0, 250)
@@ -186,8 +184,7 @@ async function loadFeed() {
       const card = document.createElement("div");
       card.classList.add("reflector-article");
       card.innerHTML = `
-        <img src="${imgUrl}" alt="Article image" loading="lazy"
-             onerror="this.onerror=null;this.src='${thumioImg}';" />
+        <img src="${imgUrl}" alt="Article image" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'" />
         <div class="reflector-article-content">
           <a href="${item.link}" target="_blank">${item.title}</a>
           <p>${cleanDesc}...</p>
