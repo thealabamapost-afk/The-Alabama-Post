@@ -159,20 +159,21 @@ footer {
 <script>
 const FEED_URL = "https://alabamareflector.com/feed/";
 const FALLBACK_IMAGE = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
-const PROXY_IMAGE = "https://images.weserv.nl/?url=";
-const PROXY_API = "https://api.codetabs.com/v1/proxy?quest="; // super stable CORS proxy
+const IMAGE_PROXY = "https://images.weserv.nl/?url=";
+const HTML_PROXY = "https://r.jina.ai/http://"; // reliable HTML fetch proxy
 const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
 const updated = document.getElementById("lastUpdated");
 
-async function getOGImage(url) {
+async function fetchOGImage(url) {
   try {
-    const res = await fetch(PROXY_API + encodeURIComponent(url));
-    const text = await res.text();
-    const match = text.match(/<meta property="og:image" content="([^"]+)"/i);
+    const cleanUrl = url.replace(/^https:\/\//i, "").replace(/^http:\/\//i, "");
+    const response = await fetch(HTML_PROXY + cleanUrl);
+    const html = await response.text();
+    const match = html.match(/<meta property="og:image" content="([^"]+)"/i);
     if (match) return match[1].replace(/^http:\/\//i, "https://");
-  } catch (e) {
-    console.warn("Image fetch failed for:", url);
+  } catch (err) {
+    console.warn("Could not fetch OG image for", url);
   }
   return FALLBACK_IMAGE;
 }
@@ -182,27 +183,27 @@ async function loadFeed() {
   feed.innerHTML = "";
 
   try {
-    const api = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(FEED_URL)}`;
-    const res = await fetch(api);
+    const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(FEED_URL)}`);
     const data = await res.json();
     spinner.style.display = "none";
 
-    if (!data.items || !data.items.length) {
+    if (!data.items || data.items.length === 0) {
       feed.innerHTML = "<p>No stories found. Please check again soon.</p>";
       return;
     }
 
     for (const item of data.items.slice(0, 8)) {
       let image = "";
-      if (item.enclosure && item.enclosure.link) image = item.enclosure.link;
-      else {
+      if (item.enclosure && item.enclosure.link) {
+        image = item.enclosure.link;
+      } else {
         const match = item.description.match(/<img[^>]+src="([^">]+)"/);
         if (match) image = match[1];
       }
 
-      if (!image) image = await getOGImage(item.link);
+      if (!image) image = await fetchOGImage(item.link);
       image = image.replace(/^http:\/\//i, "https://");
-      const proxied = PROXY_IMAGE + encodeURIComponent(image);
+      const proxied = IMAGE_PROXY + encodeURIComponent(image);
 
       const div = document.createElement("div");
       div.classList.add("reflector-article");
@@ -218,7 +219,7 @@ async function loadFeed() {
 
     updated.textContent = "Last Updated: " + new Date().toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" });
   } catch (e) {
-    console.error("Feed error:", e);
+    console.error("Feed load error:", e);
     spinner.style.display = "none";
     feed.innerHTML = "<p>Unable to load Alabama Reflector stories right now.</p>";
   }
