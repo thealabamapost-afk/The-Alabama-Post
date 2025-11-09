@@ -142,11 +142,14 @@ footer {
 </footer>
 
 <script>
-const FEED_URL = "./reflector.json";
 const FALLBACK_IMAGE = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
 const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
 const updated = document.getElementById("lastUpdated");
+
+// ✅ Auto-detect correct JSON path even on GitHub Pages
+const BASE_PATH = window.location.pathname.replace(/\/[^/]*$/, '');
+const FEED_URL = `${BASE_PATH}/reflector.json`;
 
 function extractImage(html) {
   const match = html.match(/<img[^>]+src="([^"]+)"/);
@@ -157,13 +160,16 @@ async function loadFeed() {
   spinner.style.display = "inline-block";
   feed.innerHTML = "";
   try {
-    const res = await fetch(FEED_URL);
+    const res = await fetch(FEED_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error("Bad response");
     const data = await res.json();
     spinner.style.display = "none";
+
     if (!data.items || !data.items.length) {
       feed.innerHTML = "<p>No articles found.</p>";
       return;
     }
+
     data.items.slice(0, 8).forEach(item => {
       const image = item.thumbnail || extractImage(item.content || "") || FALLBACK_IMAGE;
       const cleanDesc = item.description
@@ -180,6 +186,7 @@ async function loadFeed() {
         </div>`;
       feed.appendChild(card);
     });
+
     updated.textContent =
       "Last Updated: " +
       new Date().toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" });
