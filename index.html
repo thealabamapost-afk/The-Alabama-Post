@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>The Alabama Post | Reflector News Feed</title>
 
+<!-- Social Preview -->
 <meta property="og:image" content="https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png">
 <meta property="og:title" content="The Alabama Post | From the Alabama Reflector">
 <meta property="og:description" content="Latest news from The Alabama Reflector, updated live on The Alabama Post.">
@@ -103,9 +104,7 @@ header p {
   font-size: 1.3rem;
   line-height: 1.5;
 }
-.reflector-article a:hover {
-  text-decoration: underline;
-}
+.reflector-article a:hover { text-decoration: underline; }
 .reflector-article p {
   margin-top: 10px;
   color: #374151;
@@ -128,9 +127,7 @@ header p {
   font-weight: 600;
   transition: background 0.2s ease;
 }
-.more-btn:hover {
-  background: #991b1b;
-}
+.more-btn:hover { background: #991b1b; }
 footer {
   text-align: center;
   color: #9ca3af;
@@ -164,12 +161,11 @@ footer {
 const API_KEY = "kowavs2lr19xrqnlsdesyot0aphugzv8mjnhrt4v";
 const FEED_URL = "https://feeds.feedburner.com/alabamareflector/0zGtsmkibDb";
 const FALLBACK_IMAGE = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
-const PROXY = "https://wsrv.nl/?url=";
+const PROXY = "https://image-proxy.weserv.dev/?url=";
 const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
 const updated = document.getElementById("lastUpdated");
 
-// Get og:image directly from article HTML if RSS doesn't include one
 async function fetchArticleImage(link) {
   try {
     const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(link)}`);
@@ -198,8 +194,6 @@ async function loadFeed() {
 
     for (const item of data.items.slice(0, 8)) {
       let image = "";
-
-      // Try enclosure or inline first
       if (item.enclosure && item.enclosure.link) {
         image = item.enclosure.link;
       } else {
@@ -207,19 +201,16 @@ async function loadFeed() {
         if (match) image = match[1];
       }
 
-      // Fallback: fetch from article HTML
-      if (!image) {
-        image = await fetchArticleImage(item.link);
-      }
-
-      // Finalize
+      if (!image) image = await fetchArticleImage(item.link);
       image = image.replace(/^http:\/\//i, "https://");
-      const proxied = `${PROXY}${encodeURIComponent(image)}`;
+
+      const proxied = `${PROXY}${encodeURIComponent(image)}&default=${encodeURIComponent(FALLBACK_IMAGE)}`;
 
       const article = document.createElement("div");
       article.classList.add("reflector-article");
       article.innerHTML = `
-        <img src="${proxied}" alt="Article Image" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'" />
+        <img src="${proxied}" alt="Article Image" loading="lazy"
+             onerror="this.src='${FALLBACK_IMAGE}'" />
         <div class="reflector-article-content">
           <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>
           <p>${item.description.replace(/<[^>]*>?/gm,"").substring(0,250)}...</p>
@@ -242,5 +233,6 @@ async function loadFeed() {
 loadFeed();
 setInterval(loadFeed, 7200000);
 </script>
+
 </body>
 </html>
