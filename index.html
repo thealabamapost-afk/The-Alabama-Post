@@ -147,17 +147,10 @@ const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
 const updated = document.getElementById("lastUpdated");
 
-// ✅ Detect correct reflector.json URL for GitHub Pages
-let FEED_URL = "reflector.json";
-if (window.location.hostname.includes("github.io")) {
-  const pathParts = window.location.pathname.split("/").filter(Boolean);
-  if (pathParts.length >= 1) {
-    const repo = pathParts[0];
-    FEED_URL = `/${repo}/reflector.json`;
-  }
-}
+// 👇 reflector.json is in the SAME folder as index.html
+const FEED_URL = "reflector.json";
 
-// ✅ Helper: extract image from HTML if no thumbnail provided
+// Pull first <img src="..."> out of HTML
 function extractImage(html) {
   const match = html?.match(/<img[^>]+src="([^"]+)"/i);
   return match ? match[1] : FALLBACK_IMAGE;
@@ -169,8 +162,12 @@ async function loadFeed() {
 
   try {
     const res = await fetch(FEED_URL, { cache: "no-store" });
-    if (!res.ok) throw new Error(`Failed to load: ${res.status}`);
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status} while fetching reflector.json`);
+    }
+
     const data = await res.json();
+
     spinner.style.display = "none";
 
     if (!data.items || data.items.length === 0) {
@@ -179,8 +176,14 @@ async function loadFeed() {
     }
 
     data.items.slice(0, 8).forEach(item => {
-      const image = item.thumbnail || extractImage(item.content || item.description || "");
-      const cleanDesc = (item.description || "").replace(/<[^>]*>?/gm, "").substring(0, 250);
+      const image =
+        item.thumbnail ||
+        extractImage(item.content || item.description || "") ||
+        FALLBACK_IMAGE;
+
+      const cleanDesc = (item.description || "")
+        .replace(/<[^>]*>?/gm, "")
+        .substring(0, 250);
 
       const card = document.createElement("div");
       card.classList.add("reflector-article");
@@ -188,26 +191,35 @@ async function loadFeed() {
         <img src="${image}" alt="Article Image" loading="lazy"
              onerror="this.src='${FALLBACK_IMAGE}'" />
         <div class="reflector-article-content">
-          <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>
+          <a href="${item.link}" target="_blank" rel="noopener noreferrer">
+            ${item.title}
+          </a>
           <p>${cleanDesc}...</p>
-          <p class="credit">Source: 
-            <a href="https://alabamareflector.com" target="_blank">Alabama Reflector</a>
+          <p class="credit">
+            Source:
+            <a href="https://alabamareflector.com" target="_blank" rel="noopener noreferrer">
+              Alabama Reflector
+            </a>
           </p>
-        </div>`;
+        </div>
+      `;
       feed.appendChild(card);
     });
 
     updated.textContent =
       "Last Updated: " +
-      new Date().toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" });
-
+      new Date().toLocaleString("en-US", {
+        dateStyle: "long",
+        timeStyle: "short"
+      });
   } catch (err) {
     spinner.style.display = "none";
     feed.innerHTML = "<p>Failed to load feed.</p>";
-    console.error("❌ Error loading reflector.json:", err);
+    console.error("Error loading feed:", err);
   }
 }
 
+// Initial load
 loadFeed();
 </script>
 </body>
