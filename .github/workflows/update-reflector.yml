@@ -1,0 +1,34 @@
+name: Update Alabama Reflector Feed
+
+on:
+  schedule:
+    # Runs every 30 minutes (GitHub uses UTC time)
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}  # allows manual trigger
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install node-fetch@3
+
+      - name: Run update script
+        run: node update-reflector.js
+
+      - name: Commit and push updated reflector.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add reflector.json
+          git commit -m "Auto-update Alabama Reflector feed" || echo "No changes to commit"
+          git push
