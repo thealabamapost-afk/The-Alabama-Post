@@ -53,8 +53,14 @@ h2 {
   box-shadow:0 4px 12px rgba(0,0,0,0.08);
   width:320px;
   overflow:hidden;
-  transition:transform 0.25s ease, box-shadow 0.25s ease;
   text-align:left;
+  opacity:0;
+  transform:translateY(10px);
+  animation:fadeIn 0.8s ease forwards;
+}
+@keyframes fadeIn {
+  from {opacity:0; transform:translateY(15px);}
+  to {opacity:1; transform:translateY(0);}
 }
 .reflector-article:hover {
   transform:translateY(-5px);
@@ -68,9 +74,7 @@ h2 {
   background:#f3f3f3;
   transition:opacity 0.4s ease-in-out;
 }
-.reflector-article img:hover {
-  opacity:0.9;
-}
+.reflector-article img:hover { opacity:0.9; }
 .reflector-article-content {
   padding:18px 20px 25px;
 }
@@ -82,9 +86,7 @@ h2 {
   display:block;
   margin-bottom:8px;
 }
-.reflector-article-content a:hover {
-  text-decoration:underline;
-}
+.reflector-article-content a:hover { text-decoration:underline; }
 .reflector-article-content p {
   color:#374151;
   font-size:0.98rem;
@@ -116,15 +118,17 @@ h2 {
   transition:background 0.25s ease;
   margin-bottom:50px;
 }
-.more-btn:hover {
-  background:#991b1b;
-}
+.more-btn:hover { background:#991b1b; }
 footer {
   text-align:center;
   color:#9ca3af;
   font-size:0.9rem;
   background:#111827;
   padding:20px 0;
+}
+@media(max-width:768px){
+  #reflectorFeed {flex-direction:column; align-items:center;}
+  .reflector-article {width:90%;}
 }
 </style>
 </head>
@@ -146,8 +150,6 @@ footer {
 
 <script>
 const FALLBACK_IMAGE = "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
-
-// Microlink API for visible article screenshots
 const SCREENSHOT_PROXY = "https://api.microlink.io/?url=";
 const SCREENSHOT_PARAM = "&screenshot=true&meta=false&embed=screenshot.url";
 
@@ -155,26 +157,42 @@ const feed = document.getElementById("reflectorFeed");
 const spinner = document.getElementById("loadingSpinner");
 const updated = document.getElementById("lastUpdated");
 
+// Try local reflector.json first
 const BASE_PATH = window.location.pathname.replace(/\/[^/]*$/, '');
-const FEED_URL = `${BASE_PATH}/reflector.json`;
+const LOCAL_FEED = `${BASE_PATH}/reflector.json`;
+// Fallback: live RSS feed from Alabama Reflector
+const LIVE_FEED = "https://api.rss2json.com/v1/api.json?rss_url=https://alabamareflector.com/feed/";
+
+async function fetchJSON(url) {
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
 
 async function loadFeed() {
   spinner.style.display = "inline-block";
   feed.innerHTML = "";
 
   try {
-    const res = await fetch(FEED_URL, { cache: "no-store" });
-    if (!res.ok) throw new Error("Bad response");
-    const data = await res.json();
+    let data;
+    try {
+      data = await fetchJSON(LOCAL_FEED);
+    } catch {
+      console.warn("Local JSON unavailable — switching to live feed.");
+      data = await fetchJSON(LIVE_FEED);
+    }
     spinner.style.display = "none";
 
-    if (!data.items || !data.items.length) {
+    const items = data.items || [];
+    if (!items.length) {
       feed.innerHTML = "<p>No articles found.</p>";
       return;
     }
 
-    data.items.slice(0, 9).forEach(item => {
-      const imgUrl = `${SCREENSHOT_PROXY}${encodeURIComponent(item.link)}${SCREENSHOT_PARAM}`;
+    items.slice(0, 9).forEach((item, i) => {
+      const imgUrl = item.thumbnail && item.thumbnail.trim() !== ""
+        ? item.thumbnail
+        : `${SCREENSHOT_PROXY}${encodeURIComponent(item.link)}${SCREENSHOT_PARAM}`;
 
       const cleanDesc = item.description
         ? item.description.replace(/<[^>]*>?/gm, "").substring(0, 250)
@@ -182,6 +200,7 @@ async function loadFeed() {
 
       const card = document.createElement("div");
       card.classList.add("reflector-article");
+      card.style.animationDelay = `${i * 0.1}s`;
       card.innerHTML = `
         <img src="${imgUrl}" alt="Article image" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'" />
         <div class="reflector-article-content">
@@ -202,7 +221,7 @@ async function loadFeed() {
   }
 }
 
-// Initial load + refresh every 6 hours
+// Load initially and refresh every 6 hours
 loadFeed();
 setInterval(loadFeed, 21600000);
 </script>
