@@ -1,65 +1,35 @@
-{
-  "status": "ok",
-  "feed": {
-    "title": "Alabama Reflector",
-    "link": "https://alabamareflector.com/",
-    "description": "Clarity today for a better tomorrow",
-    "image": "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png"
-  },
-  "items": [
-    {
-      "title": "States are quietly cutting child care funding — and families are out of options",
-      "link": "https://alabamareflector.com/2025/11/08/states-are-quietly-cutting-child-care-funding-and-families-are-out-of-options/",
-      "thumbnail": "https://alabamareflector.com/wp-content/uploads/2025/11/Childcare-funding-protest-Indiana-1024x683.jpg",
-      "description": "Families in Indiana and other states are losing child care assistance due to federal funding cuts."
-    },
-    {
-      "title": "U.S. Supreme Court temporarily blocks November SNAP payments",
-      "link": "https://alabamareflector.com/2025/11/08/us-supreme-court-temporarily-blocks-november-snap-payments/",
-      "thumbnail": "https://alabamareflector.com/wp-content/uploads/2025/11/supreme-court-building-1024x683.jpg",
-      "description": "The Supreme Court has temporarily blocked a lower court ruling requiring full SNAP payments for November."
-    },
-    {
-      "title": "Health care premiums to surge for Alabamians with no ACA deal in Congress",
-      "link": "https://alabamareflector.com/2025/11/06/health-care-premiums-to-surge-for-alabamians-with-no-aca-deal-in-congress/",
-      "thumbnail": "https://alabamareflector.com/wp-content/uploads/2025/11/healthcare-premiums-1024x683.jpg",
-      "description": "Without congressional action, thousands of Alabamians face significant health insurance premium hikes."
-    },
-    {
-      "title": "Alabama bill would further restrict communications for sex offenders",
-      "link": "https://alabamareflector.com/2025/11/07/alabama-bill-would-further-restrict-communications-for-sex-offenders/",
-      "thumbnail": "https://alabamareflector.com/wp-content/uploads/2025/11/Alabama-State-House-1024x682.jpg",
-      "description": "A new Alabama bill aims to further limit communication rights for registered sex offenders in the state."
-    },
-    {
-      "title": "States’ death penalty policies are heading in sharply different directions",
-      "link": "https://alabamareflector.com/2025/11/07/states-death-penalty-policies-are-heading-in-sharply-different-directions/",
-      "thumbnail": "https://alabamareflector.com/wp-content/uploads/2025/11/death-penalty-debate-1024x682.jpg",
-      "description": "While some states ramp up executions, others continue to move toward abolition or moratoriums."
-    },
-    {
-      "title": "Trump administration issues November SNAP benefits, then asks Supreme Court to intervene",
-      "link": "https://alabamareflector.com/2025/11/07/repub/trump-administration-issues-november-snap-benefits-then-asks-supreme-court-to-intervene/",
-      "thumbnail": "https://alabamareflector.com/wp-content/uploads/2025/11/SNAP-benefits-card-1024x683.jpg",
-      "description": "The Trump administration has distributed SNAP benefits but is appealing the lower court decision."
-    },
-    {
-      "title": "Full November SNAP benefits to be issued by Trump administration despite shutdown",
-      "link": "https://alabamareflector.com/2025/11/07/repub/full-november-snap-benefits-to-be-issued-by-trump-administration-despite-shutdown/",
-      "thumbnail": "https://alabamareflector.com/wp-content/uploads/2025/11/SNAP-distribution-center-1024x683.jpg",
-      "description": "Despite a government shutdown, November SNAP benefits will still be distributed to eligible households."
-    },
-    {
-      "title": "Montgomery police arrest fifth suspect in October shooting",
-      "link": "https://alabamareflector.com/briefs/montgomery-police-arrest-fifth-suspect-in-october-shooting/",
-      "thumbnail": "https://alabamareflector.com/wp-content/uploads/2025/11/Montgomery-police-vehicle-1024x683.jpg",
-      "description": "Montgomery police have arrested a fifth suspect connected to a late-October shooting."
-    },
-    {
-      "title": "U.S. Senate fails to pass war powers resolution blocking Trump attacks on Venezuela",
-      "link": "https://alabamareflector.com/2025/11/07/repub/us-senate-fails-to-pass-war-powers-resolution-blocking-trump-attacks-on-venezuela/",
-      "thumbnail": "https://alabamareflector.com/wp-content/uploads/2025/11/Senate-floor-debate-1024x683.jpg",
-      "description": "A Senate effort to limit Trump’s authority for military action in Venezuela narrowly failed on Friday."
-    }
-  ]
-}
+name: Update Alabama Reflector feed
+
+on:
+  schedule:
+    # Every hour at minute 5 (GitHub cron is UTC)
+    - cron: "5 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Update reflector.json
+        run: node update-reflector.js
+
+      - name: Commit and push if changed
+        run: |
+          if [[ -n "$(git status --porcelain reflector.json)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add reflector.json
+            git commit -m "Auto-update Alabama Reflector feed"
+            git push
+          else
+            echo "No changes to reflector.json; nothing to commit."
+          fi
