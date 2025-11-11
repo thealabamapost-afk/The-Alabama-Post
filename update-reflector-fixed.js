@@ -1,4 +1,4 @@
-// update-reflector.js
+// update-reflector-fixed.js
 // Fetch Alabama Reflector RSS feed and save as reflector.json
 
 const fs = require("fs");
@@ -16,7 +16,7 @@ async function updateReflector() {
     if (!res.ok) throw new Error(`Failed to fetch RSS feed: ${res.status}`);
     const xml = await res.text();
 
-    // ✅ Parse XML using xml2js instead of DOMParser
+    // ✅ Node-safe parser
     const parsed = await parseStringPromise(xml, { explicitArray: false });
 
     const channel = parsed?.rss?.channel;
