@@ -1,5 +1,5 @@
 // update-reflector.js
-// Fetch Alabama Reflector RSS feed and convert to reflector.json
+// Fetch Alabama Reflector RSS feed and save as reflector.json
 
 const fs = require("fs");
 const fetch = require("node-fetch");
@@ -16,7 +16,7 @@ async function updateReflector() {
     if (!res.ok) throw new Error(`Failed to fetch RSS feed: ${res.status}`);
     const xml = await res.text();
 
-    // Use xml2js instead of DOMParser
+    // ✅ Use xml2js instead of DOMParser (Node-safe)
     const parsed = await parseStringPromise(xml, { explicitArray: false });
 
     const channel = parsed?.rss?.channel;
@@ -24,9 +24,11 @@ async function updateReflector() {
       throw new Error("No items found in RSS feed");
     }
 
-    const rawItems = Array.isArray(channel.item) ? channel.item : [channel.item];
+    const itemsArray = Array.isArray(channel.item)
+      ? channel.item
+      : [channel.item];
 
-    const items = rawItems.slice(0, 10).map((item) => {
+    const items = itemsArray.slice(0, 10).map((item) => {
       const thumb =
         item["media:thumbnail"]?.$?.url ||
         item["media:content"]?.$?.url ||
