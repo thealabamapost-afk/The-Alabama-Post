@@ -2,9 +2,8 @@ name: Update Alabama Reflector Feed
 
 on:
   schedule:
-    # Runs every 30 minutes (UTC)
-    - cron: "*/30 * * * *"
-  workflow_dispatch: {}  # Allows manual run from the Actions tab
+    - cron: "*/30 * * * *"  # Every 30 minutes
+  workflow_dispatch: {}      # Allow manual trigger
 
 jobs:
   build:
@@ -24,7 +23,7 @@ jobs:
           npm install node-fetch@2 xml2js
 
       - name: Run update script
-        run: node update-reflector-fixed.js  # ✅ ensure it runs your FIXED file
+        run: node update-reflector-fixed.js   # ✅ Run your fixed JS file
 
       - name: Commit and push updated reflector.json
         run: |
