@@ -1,13 +1,12 @@
 // update-reflector.js
-// Converts Alabama Reflector RSS feed into reflector.json
+// Fetch Alabama Reflector RSS feed and convert to reflector.json
 
 const fs = require("fs");
 const fetch = require("node-fetch");
 const { parseStringPromise } = require("xml2js");
 
-const OUTPUT_FILE = "reflector.json";
-// Use your Cloudflare Worker feed proxy:
 const FEED_URL = "https://twilight-dawn-a4d1.pinoonip23.workers.dev/";
+const OUTPUT_FILE = "reflector.json";
 
 async function updateReflector() {
   console.log("📡 Fetching latest posts from Alabama Reflector…");
@@ -17,6 +16,7 @@ async function updateReflector() {
     if (!res.ok) throw new Error(`Failed to fetch RSS feed: ${res.status}`);
     const xml = await res.text();
 
+    // Use xml2js instead of DOMParser
     const parsed = await parseStringPromise(xml, { explicitArray: false });
 
     const channel = parsed?.rss?.channel;
