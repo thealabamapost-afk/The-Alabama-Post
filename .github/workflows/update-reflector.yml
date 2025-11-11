@@ -23,7 +23,7 @@ jobs:
           npm install node-fetch@2 xml2js
 
       - name: Run update script
-        run: node update-reflector-fixed.js   # ✅ Run your fixed JS file
+        run: node update-reflector.js
 
       - name: Commit and push updated reflector.json
         run: |
@@ -32,4 +32,3 @@ jobs:
           git add reflector.json
           git commit -m "Auto-update Alabama Reflector feed" || echo "No changes to commit"
           git push
-        
