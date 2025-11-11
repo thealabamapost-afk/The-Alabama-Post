@@ -1,27 +1,31 @@
 // update-reflector.js
-// Fetches Alabama Reflector RSS feed and converts it into reflector.json
+// Converts Alabama Reflector RSS feed into reflector.json
 
 const fs = require("fs");
 const fetch = require("node-fetch");
 const { parseStringPromise } = require("xml2js");
 
-const FEED_URL = "https://twilight-dawn-a4d1.pinoonip23.workers.dev/";
 const OUTPUT_FILE = "reflector.json";
+// Use your Cloudflare Worker feed proxy:
+const FEED_URL = "https://twilight-dawn-a4d1.pinoonip23.workers.dev/";
 
 async function updateReflector() {
   console.log("📡 Fetching latest posts from Alabama Reflector…");
 
   try {
     const res = await fetch(FEED_URL);
-    if (!res.ok) throw new Error(`Failed to fetch feed: ${res.status}`);
+    if (!res.ok) throw new Error(`Failed to fetch RSS feed: ${res.status}`);
     const xml = await res.text();
 
     const parsed = await parseStringPromise(xml, { explicitArray: false });
 
     const channel = parsed?.rss?.channel;
-    if (!channel || !channel.item) throw new Error("No items found in RSS feed");
+    if (!channel || !channel.item) {
+      throw new Error("No items found in RSS feed");
+    }
 
     const rawItems = Array.isArray(channel.item) ? channel.item : [channel.item];
+
     const items = rawItems.slice(0, 10).map((item) => {
       const thumb =
         item["media:thumbnail"]?.$?.url ||
@@ -42,23 +46,25 @@ async function updateReflector() {
         title: item.title || "",
         link: item.link || "",
         thumbnail: thumb,
-        description: cleanDesc.slice(0, 200) + "...",
+        description: cleanDesc.slice(0, 220) + "...",
       };
     });
 
-    const output = {
+    const json = {
       status: "ok",
       feed: {
         title: "Alabama Reflector",
         link: "https://alabamareflector.com/",
         description: "Clarity today for a better tomorrow",
-        image: "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png",
+        image:
+          "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png",
       },
       items,
+      lastUpdated: new Date().toISOString(),
     };
 
-    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(output, null, 2));
-    console.log("✅ reflector.json updated successfully!");
+    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(json, null, 2));
+    console.log(`✅ reflector.json updated successfully with ${items.length} items`);
   } catch (err) {
     console.error("❌ Error updating reflector.json:", err.message);
     process.exit(1);
