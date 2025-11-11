@@ -1,10 +1,72 @@
 {
-  "status": "initializing",
+  "status": "ok",
   "feed": {
     "title": "Alabama Reflector",
     "link": "https://alabamareflector.com/",
-    "description": "Clarity today for a better tomorrow"
+    "description": "Clarity today for a better tomorrow",
+    "image": "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png"
   },
-  "items": [],
-  "lastUpdated": ""
+  "items": [
+    {
+      "title": "States hope to use rural health money to keep doctors, combat chronic disease",
+      "link": "https://alabamareflector.com/2025/11/11/repub/states-hope-to-use-rural-health-money-to-keep-doctors-combat-chronic-disease/",
+      "thumbnail": "",
+      "description": "A man who currently doesn't have dental insurance has his blood pressure checked at a mobile dental and medical clinic in August in Terre Haute, Ind. States have submitted grant applications to the federal Rural Health T..."
+    },
+    {
+      "title": "Kansas county agrees to pay out $3M for newspaper raid, expresses regret",
+      "link": "https://alabamareflector.com/2025/11/11/repub/kansas-county-agrees-to-pay-out-3m-for-newspaper-raid-expresses-regret/",
+      "thumbnail": "",
+      "description": "Reporters interview Eric Meyer outside of the Marion County Record office in Marion, Kansas, the site of a 2023 police raid, after an Oct. 7, 2024, court hearing for Gideon Cody, the former Marion police chief who led th..."
+    },
+    {
+      "title": "Elmore County prison opening delayed; state may borrow money for Escambia prison",
+      "link": "https://alabamareflector.com/2025/11/11/elmore-county-prison-opening-delayed-state-may-borrow-money-for-escambia-prison/",
+      "thumbnail": "",
+      "description": "A prison cell in Holman Correctional Facility in Atmore, Alabama, as seen on Oct. 22, 2019. An Alabama state senator said Monday that the opening of a new prison in Elmore County would be delayed, and that state official..."
+    },
+    {
+      "title": "U.S. Sen. Katie Britt skeptical of one-year ACA subsidy extension",
+      "link": "https://alabamareflector.com/2025/11/11/u-s-sen-katie-britt-skeptical-of-one-year-aca-subsidy-extension/",
+      "thumbnail": "",
+      "description": "U.S. Sen. Katie Britt, R-Alabama, speaks on the floor of the Alabama House of Representatives on April 17, 2025 at the Alabama Statehouse in Montgomery, Alabama. Speaking to the Montgomery Area Chamber of Commerce on Mon..."
+    },
+    {
+      "title": "Shutdown battle ebbs, but Trump won’t give up trying to withhold full SNAP benefits",
+      "link": "https://alabamareflector.com/2025/11/10/repub/shutdown-battle-ebbs-but-trump-wont-give-up-trying-to-withhold-full-snap-benefits/",
+      "thumbnail": "",
+      "description": "A 'We Accept (Food Stamps)' sign hangs in the window of a grocery store on Oct. 31, 2025 in Miami, Florida. &nbsp;(Photo by Joe Raedle/Getty Images)The Trump administration continued Monday to press the U.S. Supreme Cour..."
+    },
+    {
+      "title": "US Senate in bipartisan vote passes bill to end record-breaking shutdown, House up next",
+      "link": "https://alabamareflector.com/2025/11/10/repub/us-senate-on-verge-of-passing-bill-to-end-record-breaking-shutdown-house-up-next/",
+      "thumbnail": "",
+      "description": "Senate Majority Leader John Thune, R-S.D., speaks to reporters while walking to his office on Nov. 10, 2025 on Capitol Hill in Washington, D.C. (Photo by Tom Brenner/Getty Images)WASHINGTON — The U.S. Senate approved a s..."
+    },
+    {
+      "title": "FDA to remove black box warning from hormone replacement therapy drugs",
+      "link": "https://alabamareflector.com/2025/11/10/repub/fda-to-remove-black-box-warning-from-hormone-replacement-therapy-drugs/",
+      "thumbnail": "",
+      "description": "Blister packs of hormone replacement therapy medication. (Getty photos)WASHINGTON — The U.S. Food and Drug Administration announced Monday it plans to remove warnings from hormone replacement therapy drugs that can be us..."
+    },
+    {
+      "title": "Here’s the list of newly pardoned Trump fake electors, other allies",
+      "link": "https://alabamareflector.com/2025/11/10/repub/heres-the-list-of-newly-pardoned-trump-fake-electors-other-allies/",
+      "thumbnail": "",
+      "description": "President Donald Trump attends inauguration ceremonies in the Rotunda of the U.S. Capitol on Jan. 20, 2025 in Washington, D.C. (Photo by Chip Somodevilla/Getty Images)WASHINGTON — President Donald Trump announced on Mond..."
+    },
+    {
+      "title": "Gov. Kay Ivey appoints legal advisor Will Parker to Alabama Supreme Court",
+      "link": "https://alabamareflector.com/briefs/gov-kay-ivey-appoints-legal-advisor-will-parker-to-alabama-supreme-court/",
+      "thumbnail": "",
+      "description": "The Heflin-Torbert Judicial Building in downtown Montgomery, Alabama, seen on January 24, 2023. The building houses the Alabama Supreme Court and the state appellate courts. Gov. Kay Ivey appointed Will Parker, her gener..."
+    },
+    {
+      "title": "The midterm ballot measure battles have already begun",
+      "link": "https://alabamareflector.com/2025/11/10/repub/the-midterm-ballot-measure-battles-have-already-begun/",
+      "thumbnail": "",
+      "description": "Katherine Ostler votes while her 8-year-old son, Henry, looks on in November 2024 in Salt Lake City. Ahead of the 2026 midterm elections, battles are already underway across the country over state ballot measure campaign..."
+    }
+  ],
+  "lastUpdated": "2025-11-11T19:45:19.915Z"
 }
