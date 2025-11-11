@@ -4,7 +4,7 @@ on:
   schedule:
     # Runs every 30 minutes (GitHub uses UTC time)
     - cron: "*/30 * * * *"
-  workflow_dispatch: {}  # allows manual trigger
+  workflow_dispatch: {} # allows manual trigger
 
 jobs:
   build:
@@ -17,10 +17,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "18" # Node 18 for compatibility with CommonJS
 
       - name: Install dependencies
-        run: npm install node-fetch@3
+        run: npm install node-fetch@2 xml2js
 
       - name: Run update script
         run: node update-reflector.js
