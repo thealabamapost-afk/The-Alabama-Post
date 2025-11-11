@@ -1,11 +1,11 @@
 // update-reflector-fixed.js
-// Fetch Alabama Reflector RSS feed and save as reflector.json
+// Fetch Alabama Reflector RSS feed and save as reflector.json (Node-compatible)
 
 const fs = require("fs");
 const fetch = require("node-fetch");
 const { parseStringPromise } = require("xml2js");
 
-const FEED_URL = "https://twilight-dawn-a4d1.pinoonip23.workers.dev/";
+const FEED_URL = "https://alabamareflector.com/feed/";
 const OUTPUT_FILE = "reflector.json";
 
 async function updateReflector() {
@@ -16,33 +16,21 @@ async function updateReflector() {
     if (!res.ok) throw new Error(`Failed to fetch RSS feed: ${res.status}`);
     const xml = await res.text();
 
-    // ✅ Node-safe parser
+    // ✅ Parse RSS feed safely for Node
     const parsed = await parseStringPromise(xml, { explicitArray: false });
 
     const channel = parsed?.rss?.channel;
-    if (!channel || !channel.item) {
-      throw new Error("No items found in RSS feed");
-    }
+    if (!channel || !channel.item) throw new Error("No items found in RSS feed");
 
-    const itemsArray = Array.isArray(channel.item)
-      ? channel.item
-      : [channel.item];
-
+    const itemsArray = Array.isArray(channel.item) ? channel.item : [channel.item];
     const items = itemsArray.slice(0, 10).map((item) => {
       const thumb =
         item["media:thumbnail"]?.$?.url ||
         item["media:content"]?.$?.url ||
         "";
 
-      const rawDesc =
-        item["content:encoded"] ||
-        item.description ||
-        "";
-
-      const cleanDesc = rawDesc
-        .replace(/<[^>]*>/g, "")
-        .replace(/\s+/g, " ")
-        .trim();
+      const rawDesc = item["content:encoded"] || item.description || "";
+      const cleanDesc = rawDesc.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
 
       return {
         title: item.title || "",
