@@ -1,11 +1,10 @@
 {
-  "status": "ok",
+  "status": "initializing",
   "feed": {
     "title": "Alabama Reflector",
     "link": "https://alabamareflector.com/",
-    "description": "Clarity today for a better tomorrow",
-    "image": "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png"
+    "description": "Clarity today for a better tomorrow"
   },
   "items": [],
-  "lastUpdated": null
+  "lastUpdated": ""
 }
