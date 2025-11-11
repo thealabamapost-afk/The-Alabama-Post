@@ -3,9 +3,9 @@ import fetch from "node-fetch";
 
 const OUTPUT_FILE = "reflector.json";
 
-// Use a different public proxy (it works from GitHub runners)
+// Using a permanent proxy mirror that fetches the RSS feed outside GitHub’s IP range
 const FEED_URL =
-  "https://api.codetabs.com/v1/proxy/?quest=https://alabamareflector.com/feed/";
+  "https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Falabamareflector.com%2Ffeed%2F";
 
 async function updateReflector() {
   console.log("📰 Fetching latest posts from Alabama Reflector…");
@@ -21,48 +21,36 @@ async function updateReflector() {
     if (!res.ok)
       throw new Error(`Failed to fetch RSS feed: HTTP ${res.status}`);
 
-    const xml = await res.text();
+    const data = await res.json();
 
-    // Parse <item> blocks from RSS XML
-    const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)]
-      .slice(0, 9)
-      .map((match) => {
-        const item = match[1];
-        const extract = (tag) =>
-          (item.match(new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`))?.[1] || "")
-            .replace(/<!\[CDATA\[|\]\]>/g, "")
-            .trim();
+    if (!data.items || data.items.length === 0)
+      throw new Error("No items found in the RSS feed.");
 
-        const title = extract("title");
-        const link = extract("link");
-        const desc = extract("description");
-        const img =
-          desc.match(/<img[^>]+src=["'](.*?)["']/)?.[1] ||
-          "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
-
-        return {
-          title,
-          link,
-          thumbnail: img,
-          description: desc.replace(/<[^>]*>?/gm, "").substring(0, 250)
-        };
-      });
-
-    if (!items.length) throw new Error("No items found in RSS feed.");
-
-    const data = {
+    const feedData = {
       status: "ok",
       feed: {
-        title: "Alabama Reflector",
-        link: "https://alabamareflector.com/",
-        description: "Clarity today for a better tomorrow",
+        title: data.feed?.title || "Alabama Reflector",
+        link: data.feed?.link || "https://alabamareflector.com/",
+        description:
+          data.feed?.description || "Clarity today for a better tomorrow",
         image:
+          data.feed?.image ||
           "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png"
       },
-      items
+      items: data.items.slice(0, 9).map((item) => ({
+        title: item.title,
+        link: item.link,
+        thumbnail:
+          item.thumbnail ||
+          "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png",
+        description:
+          (item.description || "")
+            .replace(/(<([^>]+)>)/gi, "")
+            .substring(0, 250)
+      }))
     };
 
-    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(data, null, 2));
+    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(feedData, null, 2));
     console.log("✅ reflector.json updated successfully!");
   } catch (err) {
     console.error("❌ Error updating reflector.json:", err.message);
