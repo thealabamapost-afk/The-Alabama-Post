@@ -1,32 +1,52 @@
-import fs from "fs";
-import fetch from "node-fetch";
+// update-reflector.js
+// Fetches Alabama Reflector RSS feed and converts it into reflector.json
 
+const fs = require("fs");
+const fetch = require("node-fetch");
+const { parseStringPromise } = require("xml2js");
+
+const FEED_URL = "https://twilight-dawn-a4d1.pinoonip23.workers.dev/";
 const OUTPUT_FILE = "reflector.json";
-const FEED_URL = "https://twilight-dawn-a4d1.pinoonip23.workers.dev/"; // your Cloudflare Worker feed proxy
 
 async function updateReflector() {
-  console.log("📰 Fetching latest posts from Alabama Reflector…");
+  console.log("📡 Fetching latest posts from Alabama Reflector…");
 
   try {
     const res = await fetch(FEED_URL);
     if (!res.ok) throw new Error(`Failed to fetch feed: ${res.status}`);
-    const text = await res.text();
+    const xml = await res.text();
 
-    // Parse RSS XML
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(text, "text/xml");
-    const items = xmlDoc.querySelectorAll("item");
+    const parsed = await parseStringPromise(xml, { explicitArray: false });
 
-    const posts = Array.from(items).slice(0, 10).map((item) => ({
-      title: item.querySelector("title")?.textContent.trim() || "Untitled",
-      link: item.querySelector("link")?.textContent.trim() || "",
-      description:
-        item.querySelector("description")?.textContent.trim().replace(/<[^>]+>/g, "").slice(0, 200) +
-          "..." || "",
-      thumbnail: item.querySelector("media\\:content, enclosure")?.getAttribute("url") || "",
-    }));
+    const channel = parsed?.rss?.channel;
+    if (!channel || !channel.item) throw new Error("No items found in RSS feed");
 
-    const data = {
+    const rawItems = Array.isArray(channel.item) ? channel.item : [channel.item];
+    const items = rawItems.slice(0, 10).map((item) => {
+      const thumb =
+        item["media:thumbnail"]?.$?.url ||
+        item["media:content"]?.$?.url ||
+        "";
+
+      const rawDesc =
+        item["content:encoded"] ||
+        item.description ||
+        "";
+
+      const cleanDesc = rawDesc
+        .replace(/<[^>]*>/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      return {
+        title: item.title || "",
+        link: item.link || "",
+        thumbnail: thumb,
+        description: cleanDesc.slice(0, 200) + "...",
+      };
+    });
+
+    const output = {
       status: "ok",
       feed: {
         title: "Alabama Reflector",
@@ -34,10 +54,10 @@ async function updateReflector() {
         description: "Clarity today for a better tomorrow",
         image: "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png",
       },
-      items: posts,
+      items,
     };
 
-    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(data, null, 2));
+    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(output, null, 2));
     console.log("✅ reflector.json updated successfully!");
   } catch (err) {
     console.error("❌ Error updating reflector.json:", err.message);
