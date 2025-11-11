@@ -12,12 +12,11 @@ async function updateReflector() {
   console.log("📡 Fetching latest posts from Alabama Reflector…");
 
   try {
-    // Fetch RSS feed
     const res = await fetch(FEED_URL);
     if (!res.ok) throw new Error(`Failed to fetch RSS feed: ${res.status}`);
     const xml = await res.text();
 
-    // Parse XML safely in Node.js using xml2js (NO DOMParser)
+    // ✅ Parse XML using xml2js instead of DOMParser
     const parsed = await parseStringPromise(xml, { explicitArray: false });
 
     const channel = parsed?.rss?.channel;
@@ -25,7 +24,6 @@ async function updateReflector() {
       throw new Error("No items found in RSS feed");
     }
 
-    // Make sure items is always an array
     const itemsArray = Array.isArray(channel.item)
       ? channel.item
       : [channel.item];
@@ -42,8 +40,8 @@ async function updateReflector() {
         "";
 
       const cleanDesc = rawDesc
-        .replace(/<[^>]*>/g, "") // remove HTML tags
-        .replace(/\s+/g, " ")    // normalize spaces
+        .replace(/<[^>]*>/g, "")
+        .replace(/\s+/g, " ")
         .trim();
 
       return {
