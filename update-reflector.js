@@ -12,11 +12,13 @@ async function updateReflector() {
   console.log("📡 Fetching latest posts from Alabama Reflector…");
 
   try {
+    // Fetch RSS feed from Cloudflare Worker
     const res = await fetch(FEED_URL);
     if (!res.ok) throw new Error(`Failed to fetch RSS feed: ${res.status}`);
+
     const xml = await res.text();
 
-    // ✅ Use xml2js instead of DOMParser (Node-safe)
+    // ✅ Parse XML safely in Node.js (no DOMParser!)
     const parsed = await parseStringPromise(xml, { explicitArray: false });
 
     const channel = parsed?.rss?.channel;
@@ -28,6 +30,7 @@ async function updateReflector() {
       ? channel.item
       : [channel.item];
 
+    // Map feed items into a clean JSON format
     const items = itemsArray.slice(0, 10).map((item) => {
       const thumb =
         item["media:thumbnail"]?.$?.url ||
@@ -40,8 +43,8 @@ async function updateReflector() {
         "";
 
       const cleanDesc = rawDesc
-        .replace(/<[^>]*>/g, "")
-        .replace(/\s+/g, " ")
+        .replace(/<[^>]*>/g, "") // strip HTML tags
+        .replace(/\s+/g, " ") // collapse spaces
         .trim();
 
       return {
@@ -52,6 +55,7 @@ async function updateReflector() {
       };
     });
 
+    // Build JSON output
     const json = {
       status: "ok",
       feed: {
@@ -65,6 +69,7 @@ async function updateReflector() {
       lastUpdated: new Date().toISOString(),
     };
 
+    // Save to reflector.json
     fs.writeFileSync(OUTPUT_FILE, JSON.stringify(json, null, 2));
     console.log(`✅ reflector.json updated successfully with ${items.length} items`);
   } catch (err) {
