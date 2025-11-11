@@ -4,7 +4,7 @@ on:
   schedule:
     # Runs every 30 minutes (UTC)
     - cron: "*/30 * * * *"
-  workflow_dispatch: {}  # Allows manual trigger from the Actions tab
+  workflow_dispatch: {}  # Allows manual run from the Actions tab
 
 jobs:
   build:
@@ -17,14 +17,14 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"  # Stable and compatible version
+          node-version: "18"
 
       - name: Install dependencies
         run: |
           npm install node-fetch@2 xml2js
 
       - name: Run update script
-        run: node update-reflector-fixed.js  # ✅ uses your fixed file name
+        run: node update-reflector-fixed.js  # ✅ ensure it runs your FIXED file
 
       - name: Commit and push updated reflector.json
         run: |
