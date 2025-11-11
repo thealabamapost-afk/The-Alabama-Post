@@ -1,46 +1,11 @@
-import fs from "fs";
-import fetch from "node-fetch";
-
-const OUTPUT_FILE = "reflector.json";
-const FEED_URL =
-  "https://api.rss2json.com/v1/api.json?rss_url=https://alabamareflector.com/feed/";
-
-async function updateReflector() {
-  console.log("📡 Fetching latest posts from Alabama Reflector via RSS…");
-
-  try {
-    const res = await fetch(FEED_URL);
-    if (!res.ok) throw new Error(`Failed to fetch RSS feed: ${res.status}`);
-    const data = await res.json();
-
-    if (!data.items || data.items.length === 0) {
-      throw new Error("No items found in the RSS feed.");
-    }
-
-    const items = data.items.slice(0, 9).map(item => ({
-      title: item.title,
-      link: item.link,
-      thumbnail: item.thumbnail || "",
-      description: item.description || "",
-    }));
-
-    const output = {
-      status: "ok",
-      feed: {
-        title: data.feed.title,
-        link: data.feed.link,
-        description: data.feed.description,
-        image: data.feed.image,
-      },
-      items,
-    };
-
-    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(output, null, 2));
-    console.log("✅ reflector.json updated successfully!");
-  } catch (err) {
-    console.error("❌ Error updating reflector.json:", err.message);
-    process.exit(1);
-  }
+{
+  "status": "ok",
+  "feed": {
+    "title": "Alabama Reflector",
+    "link": "https://alabamareflector.com/",
+    "description": "Clarity today for a better tomorrow",
+    "image": "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png"
+  },
+  "items": [],
+  "lastUpdated": ""
 }
-
-updateReflector();
