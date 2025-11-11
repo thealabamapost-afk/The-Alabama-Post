@@ -3,9 +3,9 @@ import fetch from "node-fetch";
 
 const OUTPUT_FILE = "reflector.json";
 
-// Use a public proxy that allows server-to-server GitHub requests
+// Use a different public proxy (it works from GitHub runners)
 const FEED_URL =
-  "https://api.allorigins.workers.dev/raw?url=https://alabamareflector.com/feed/";
+  "https://api.codetabs.com/v1/proxy/?quest=https://alabamareflector.com/feed/";
 
 async function updateReflector() {
   console.log("📰 Fetching latest posts from Alabama Reflector…");
@@ -23,7 +23,7 @@ async function updateReflector() {
 
     const xml = await res.text();
 
-    // Very light XML parsing
+    // Parse <item> blocks from RSS XML
     const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)]
       .slice(0, 9)
       .map((match) => {
@@ -32,12 +32,14 @@ async function updateReflector() {
           (item.match(new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`))?.[1] || "")
             .replace(/<!\[CDATA\[|\]\]>/g, "")
             .trim();
+
         const title = extract("title");
         const link = extract("link");
         const desc = extract("description");
         const img =
           desc.match(/<img[^>]+src=["'](.*?)["']/)?.[1] ||
           "https://alabamareflector.com/wp-content/uploads/2023/07/Alabama-Reflector-logo.png";
+
         return {
           title,
           link,
