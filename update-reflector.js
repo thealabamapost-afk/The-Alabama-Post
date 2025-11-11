@@ -1,4 +1,4 @@
-// update-reflector-fixed.js
+// update-reflector.js
 // Fetch Alabama Reflector RSS feed and save as reflector.json (Node-compatible)
 
 const fs = require("fs");
